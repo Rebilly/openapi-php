@@ -1,11 +1,15 @@
-Swagger PHP SDK
-===============
+# OpenAPI Specification SDK for PHP
 
-[![Travis Build Status](https://img.shields.io/travis/rebilly/php-swagger/master.svg?style=flat-square)](https://travis-ci.org/rebilly/php-swagger)
+[![Travis Build Status](https://img.shields.io/travis/rebilly/openapi-php/master.svg?style=flat-square)](https://travis-ci.org/rebilly/openapi-php)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/rebilly/openapi-php/master/LICENSE)
 
-## Installation
+## Installing via Composer
 
-*TBD*
+You can use [Composer](https://getcomposer.org).
+
+```bash
+composer require rebilly/openapi-php
+```
 
 ## Usage
 
