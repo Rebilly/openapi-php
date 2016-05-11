@@ -1,7 +1,7 @@
 # OpenAPI Specification SDK for PHP
 
-[![Travis Build Status](https://img.shields.io/travis/rebilly/openapi-php/master.svg?style=flat-square)](https://travis-ci.org/rebilly/openapi-php)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/rebilly/openapi-php/master/LICENSE)
+[![Travis Build Status](https://img.shields.io/travis/Rebilly/openapi-php/master.svg?style=flat-square)](https://travis-ci.org/Rebilly/openapi-php)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/Rebilly/openapi-php/master/LICENSE)
 
 ## Installing via Composer
 
