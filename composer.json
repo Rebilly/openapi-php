@@ -1,0 +1,45 @@
+{
+  "name": "rebilly/openapi-php",
+  "description": "OpenAPI Specification SDK for PHP",
+  "license": "MIT",
+  "keywords": [],
+  "homepage": "https://github.com/rebilly/openapi-php/",
+  "authors": [
+    {
+      "name": "Veaceslav Medvedev",
+      "email": "slavcopost@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "justinrainbow/json-schema": "~2.0",
+    "php": "~5.6|~7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Rebilly\\OpenAPI\\": ["src"]
+    }
+  },
+  "require-dev": {
+    "guzzlehttp/guzzle": "~6.2",
+    "psr/http-message": "~1.0",
+    "fabpot/php-cs-fixer": "~1.0",
+    "phpunit/phpunit": "~4.8|~5.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Rebilly\\OpenAPI\\": ["tests"]
+    }
+  },
+  "suggest": {
+    "guzzlehttp/guzzle": "~6.2",
+    "psr/http-message": "~1.0"
+  },
+  "scripts": {
+    "cs": "./vendor/bin/php-cs-fixer fix --verbose --dry-run",
+    "cs-fix": "./vendor/bin/php-cs-fixer fix --verbose",
+    "test-wip": "./vendor/bin/phpunit --group=wip",
+    "test": "./vendor/bin/phpunit"
+  }
+}
