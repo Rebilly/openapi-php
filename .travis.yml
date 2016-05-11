@@ -29,4 +29,4 @@ script:
   - if [[ $EXECUTE_COVERAGE == 'true' ]]; then ./vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/clover.xml ; fi
   - if [[ $EXECUTE_COVERAGE != 'true' ]]; then ./vendor/bin/phpunit ; fi
   # PHP CS Fixer
-  - if [[ EXECUTE_CS_CHECK != 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --dry-run ; fi
+  - if [[ EXECUTE_CS_CHECK == 'true' ]]; then ./vendor/bin/php-cs-fixer fix -v --dry-run ; fi
