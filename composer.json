@@ -24,6 +24,7 @@
   "require-dev": {
     "guzzlehttp/guzzle": "~6.2",
     "psr/http-message": "~1.0",
+    "scrutinizer/ocular": "~1.1",
     "fabpot/php-cs-fixer": "~1.0",
     "phpunit/phpunit": "~4.8|~5.0"
   },
