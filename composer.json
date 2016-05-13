@@ -42,5 +42,10 @@
     "cs-fix": "./vendor/bin/php-cs-fixer fix --verbose",
     "test-wip": "./vendor/bin/phpunit --group=wip",
     "test": "./vendor/bin/phpunit"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
   }
 }
