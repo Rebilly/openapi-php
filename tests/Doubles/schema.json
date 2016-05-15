@@ -100,8 +100,35 @@
           "description": "The post ID",
           "required": true,
           "type": "string"
+        },
+        {
+          "name": "Content-Type",
+          "in": "header",
+          "type": "array",
+          "required": true,
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
         }
       ],
+      "options": {
+        "description": "Returns options",
+        "responses": {
+          "204": {
+            "headers": {
+              "Allow": {
+                "type": "array",
+                "required": true,
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "description": "Returns post by ID",
         "responses": {
@@ -109,6 +136,16 @@
             "description": "Post response",
             "schema": {
               "$ref": "#/definitions/Post"
+            },
+            "headers": {
+              "Content-Type": {
+                "type": "array",
+                "required": true,
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         }

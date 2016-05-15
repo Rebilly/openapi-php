@@ -155,12 +155,23 @@ final class Schema
     public function getRequestBodySchema($template, $method)
     {
         $parameters = $this->getRequestParameters($template, $method, 'body');
+        $count = count($parameters);
 
-        if (count($parameters) > 1) {
+        if ($count === 0) {
+            return null;
+        }
+
+        if ($count > 1) {
             throw new UnexpectedValueException('Multiple body parameters found');
         }
 
-        return reset($parameters) ?: null;
+        $body = reset($parameters);
+
+        if (!isset($body->schema)) {
+            throw new UnexpectedValueException('Invalid body parameter definition');
+        }
+
+        return $body->schema;
     }
 
     /**
