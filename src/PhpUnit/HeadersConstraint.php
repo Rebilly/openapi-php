@@ -37,7 +37,8 @@ final class HeadersConstraint extends Constraint
     /**
      * @param array $expectedHeadersSchemas
      */
-    public function __construct(array $expectedHeadersSchemas) {
+    public function __construct(array $expectedHeadersSchemas)
+    {
         parent::__construct();
 
         $this->expectedHeadersSchemas = array_map([$this, 'normalizeJsonSchema'], $expectedHeadersSchemas);
