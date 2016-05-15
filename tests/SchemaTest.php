@@ -236,4 +236,35 @@ final class SchemaTest extends TestCase
 
         $spec->getRequestHeaderSchemas('/posts', 'get');
     }
+
+    /**
+     * @test
+     */
+    public function shouldGetExceptionOnInvalidRequestBodyDeclaration()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid body parameter definition');
+
+        $spec = new Schema(
+            $this->createObject(
+                [
+                    'swagger' => '2.0',
+                    'host' => 'localhost',
+                    'paths' => [
+                        '/posts' => [
+                            'parameters' => [
+                                [
+                                    'name' => 'foo',
+                                    'in' => 'body',
+                                ],
+                            ],
+                            'get' => [],
+                        ],
+                    ],
+                ]
+            )
+        );
+
+        $spec->getRequestBodySchema('/posts', 'get');
+    }
 }
