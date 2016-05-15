@@ -10,10 +10,9 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
-use JsonSchema\Constraints\ConstraintInterface as Validator;
-use JsonSchema\Constraints\Factory;
 use PHPUnit_Framework_Constraint as Constraint;
 use Psr\Http\Message\UriInterface;
+use Rebilly\OpenAPI\JsonSchema\Validator;
 use Rebilly\OpenAPI\UnexpectedValueException;
 
 /**
@@ -86,7 +85,7 @@ final class UriConstraint extends Constraint
         $this->template = $template;
         $this->templateParams = array_map([$this, 'normalizeJsonSchema'], $pathParams);
         $this->queryParams = array_map([$this, 'normalizeJsonSchema'], $queryParams);
-        $this->validator = $this->createJsonValidator('undefined');
+        $this->validator = new Validator('undefined');
     }
 
     /**
@@ -146,7 +145,10 @@ final class UriConstraint extends Constraint
                         // TODO: Consider to disallow non-string params in path, that make no sense
                         $actualSegment = $this->normalizeNumericString($actualSegment);
 
-                        $this->validator->check($actualSegment, $pathParamSchema, 'path');
+                        $this->errors = array_merge(
+                            $this->errors,
+                            $this->validator->validate($actualSegment, $pathParamSchema, 'path')
+                        );
                     }
                 }
             }
@@ -162,7 +164,10 @@ final class UriConstraint extends Constraint
                 // TODO: Consider to disallow non-string params in query, that make no sense
                 $actualQueryParam = $this->normalizeNumericString($actualQueryParam);
 
-                $this->validator->check($actualQueryParam, $queryParamSchema, 'query');
+                $this->errors = array_merge(
+                    $this->errors,
+                    $this->validator->validate($actualQueryParam, $queryParamSchema, 'query')
+                );
             } elseif (isset($queryParamSchema->required) && $queryParamSchema->required) {
                 $this->errors[] = [
                     'property' => 'query',
@@ -170,8 +175,6 @@ final class UriConstraint extends Constraint
                 ];
             }
         }
-
-        $this->errors = array_merge($this->errors, $this->validator->getErrors());
 
         return empty($this->errors);
     }
@@ -189,15 +192,7 @@ final class UriConstraint extends Constraint
      */
     protected function additionalFailureDescription($other)
     {
-        return "\n" . implode(
-            "\n",
-            array_map(
-                function ($error) {
-                    return "[{$error['property']}] {$error['message']}";
-                },
-                $this->errors
-            )
-        );
+        return $this->validator->serializeErrors($this->errors);
     }
 
     /**
@@ -261,21 +256,5 @@ final class UriConstraint extends Constraint
     private static function splitString($pattern, $subject)
     {
         return preg_split($pattern, $subject, -1, PREG_SPLIT_NO_EMPTY);
-    }
-
-    /**
-     * @param string $context
-     *
-     * @return Validator
-     */
-    private static function createJsonValidator($context)
-    {
-        static $validators;
-
-        if (!$validators) {
-            $validators = new Factory();
-        }
-
-        return $validators->createInstanceFor($context);
     }
 }
