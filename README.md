@@ -24,8 +24,8 @@ composer require rebilly/openapi-php
 
 ```bash
 # install required files
-$ composer self-update
-$ composer install
+composer self-update
+composer install
 
 # run the test (from project root)
 phpunit
