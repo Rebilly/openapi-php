@@ -118,10 +118,10 @@ final class HeadersConstraint extends Constraint
      */
     private static function normalizeHeaderValue($value)
     {
-        if (is_string($value)) {
+        if (is_string($value) && strpos($value, ',') !== false) {
             return preg_split('#\s*,\s*#', $value, -1, PREG_SPLIT_NO_EMPTY);
         } else {
-            return (array) $value;
+            return $value;
         }
     }
 }
