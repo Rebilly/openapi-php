@@ -297,4 +297,19 @@ trait Asserts
             Assert::assertEmpty(json_decode($body), $msg);
         }
     }
+
+    /**
+     * @param Spec $spec
+     * @param string $class
+     * @param mixed $actual
+     * @param string $msg
+     */
+    final protected static function assertDefinitionSchema(Spec $spec, $class, $actual, $msg = '')
+    {
+        Assert::assertThat(
+            $actual,
+            new JsonSchemaConstraint($spec->getDefinition($class)),
+            $msg
+        );
+    }
 }
