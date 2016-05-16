@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.1.3] 2016-05-17
+
+### Added
+- Add `Asserts::assertDefinitionSchema` to assert values against definition.
+
+## [0.1.2] 2016-05-16
 
 ### Fixed
 - Fixed normalizing headers with scalar value in HeadersConstraint.
