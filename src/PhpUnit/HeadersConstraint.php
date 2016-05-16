@@ -122,7 +122,7 @@ final class HeadersConstraint extends Constraint
     private static function normalizeHeaderValue(array $value, $type)
     {
         if ($type !== 'array') {
-            $value = reset($value) ?: null;
+            $value = empty($value) ? null : reset($value);
 
             if (is_numeric($value)) {
                 $value += 0;
