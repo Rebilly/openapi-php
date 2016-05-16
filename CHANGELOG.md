@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- Fixed normalizing headers with scalar value in HeadersConstraint.
+
 ## [0.1.1] 2016-05-15
 
 ### Added
