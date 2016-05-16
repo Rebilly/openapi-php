@@ -65,12 +65,12 @@ class HeadersConstraintTest extends TestCase
     /**
      * @test
      */
-    public function AssertValidHeaders()
+    public function assertValidHeaders()
     {
         $headers = [
-            'Content-Type' => 'application/json',
-            'Allow' => 'OPTIONS, HEAD',
-            'X-Timestamp' => time(),
+            'Content-Type' => ['application/json'],
+            'Allow' => ['OPTIONS', 'HEAD'],
+            'X-Timestamp' => [time()],
         ];
 
         $this->assertThat($headers, $this->constraint);
@@ -107,15 +107,15 @@ class HeadersConstraintTest extends TestCase
             'Missing required header' => [
                 [],
             ],
-            '[Allow] String value found, but an array is required' => [
+            '[Allow] There must be a minimum of 2 items in the array' => [
                 [
-                    'Content-Type' => 'application/json',
-                    'Allow' => 'OPTIONS',
+                    'Content-Type' => ['application/json'],
+                    'Allow' => ['OPTIONS'],
                 ],
             ],
             '[X-Timestamp] String value found, but an integer is required' => [
                 [
-                    'X-Timestamp' => 'foo',
+                    'X-Timestamp' => ['foo'],
                 ],
             ],
         ];

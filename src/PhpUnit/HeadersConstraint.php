@@ -57,7 +57,7 @@ final class HeadersConstraint extends Constraint
         foreach ($this->expectedHeadersSchemas as $name => $expectedSchema) {
             if (isset($actualHeaders[$name])) {
                 $errors = $this->validator->validate(
-                    $this->normalizeHeaderValue($actualHeaders[$name]),
+                    $this->normalizeHeaderValue($actualHeaders[$name], $expectedSchema->type),
                     $expectedSchema,
                     $name
                 );
@@ -110,18 +110,25 @@ final class HeadersConstraint extends Constraint
     }
 
     /**
-     * Ensure header value is array.
+     * The PSR-7 says that the header values MUST be an array of strings,
+     * but OpenAPI allow scalar values. So if scalar value expected,
+     * we try to cast array to scalar, using first element.
      *
-     * @param mixed $value
+     * @param array $value
+     * @param string $type
      *
      * @return array
      */
-    private static function normalizeHeaderValue($value)
+    private static function normalizeHeaderValue(array $value, $type)
     {
-        if (is_string($value) && strpos($value, ',') !== false) {
-            return preg_split('#\s*,\s*#', $value, -1, PREG_SPLIT_NO_EMPTY);
-        } else {
-            return $value;
+        if ($type !== 'array') {
+            $value = reset($value) ?: null;
+
+            if (is_numeric($value)) {
+                $value += 0;
+            }
         }
+
+        return $value;
     }
 }
