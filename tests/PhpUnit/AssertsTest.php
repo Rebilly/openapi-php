@@ -90,6 +90,18 @@ final class AssertsTest extends TestCase
     }
 
     /**
+     * @test
+     * @dataProvider provideValidObjects
+     *
+     * @param string $class
+     * @param object $object
+     */
+    public function validateValidDefinition($class, $object)
+    {
+        $this->assertDefinitionSchema($this->spec, $class, $object);
+    }
+
+    /**
      * @return array
      */
     public function provideValidRequests()
@@ -171,6 +183,29 @@ final class AssertsTest extends TestCase
                 '/posts',
                 'POST',
                 new Response(201, $headers, $body),
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function provideValidObjects()
+    {
+        return [
+            [
+                'Post',
+                $this->createObject(
+                    [
+                        'id' => 'foo',
+                        'title' => 'Hello world!',
+                        'body' => 'Hello world!',
+                        'author' => [
+                            'name' => 'John Dou',
+                            'email' => 'john.dou@mail.com',
+                        ],
+                    ]
+                ),
             ],
         ];
     }
