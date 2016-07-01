@@ -41,7 +41,7 @@ final class SchemaFactory
     {
         return new Schema(
             $this->resolver->resolve(
-                strpos('//', $uri) === false
+                strpos($uri, '//') === false
                     ? "file://{$uri}"
                     : $uri
             )
