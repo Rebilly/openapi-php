@@ -310,6 +310,7 @@ final class Schema
 
     /**
      * A list of parameters that are applicable for this operation.
+     *
      * If a parameter is already defined at the Path Item,
      * the new definition will override it, but can never remove it.
      *
@@ -323,10 +324,34 @@ final class Schema
     {
         $path = $this->fetch($this->schema, 'paths', $template);
 
-        $parameters = $this->fetch($path, $method, 'parameters') ?: $this->fetch($path, 'parameters');
+        $operationParameters = $this->normalizeRequestParameters(
+            (array) $this->fetch($path, $method, 'parameters'),
+            $location
+        );
+
+        $pathParameters = $this->normalizeRequestParameters(
+            (array) $this->fetch($path, 'parameters'),
+            $location
+        );
+
+        return $operationParameters + $pathParameters;
+    }
+
+    /**
+     * Normalizes parameters definitions.
+     *
+     * Filter parameters by location, and use name as list index.
+     *
+     * @param array $parameters
+     * @param string $location
+     *
+     * @return object[]
+     */
+    private function normalizeRequestParameters(array $parameters, $location)
+    {
         $schemas = [];
 
-        foreach ((array) $parameters as $parameter) {
+        foreach ($parameters as $parameter) {
             if ($parameter->in !== $location) {
                 continue;
             }
