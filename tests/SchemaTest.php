@@ -170,6 +170,57 @@ final class SchemaTest extends TestCase
     /**
      * @test
      */
+    public function shouldGetUnionOfParameters()
+    {
+        $spec = new Schema(
+            $this->createObject(
+                [
+                    'swagger' => '2.0',
+                    'host' => 'localhost',
+                    'paths' => [
+                        '/posts' => [
+                            'parameters' => [
+                                [
+                                    'name' => 'foo',
+                                    'in' => 'header',
+                                    'required' => false,
+                                ],
+                                [
+                                    'name' => 'bar',
+                                    'in' => 'header',
+                                ],
+                            ],
+                            'get' => [
+                                'parameters' => [
+                                    [
+                                        'name' => 'baz',
+                                        'in' => 'header',
+                                    ],
+                                    [
+                                        'name' => 'foo',
+                                        'in' => 'header',
+                                        'required' => true,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            )
+        );
+
+        $parameters = $spec->getRequestHeaderSchemas('/posts', 'get');
+
+        $this->assertCount(3, $parameters);
+        $this->assertArrayHasKey('foo', $parameters);
+        $this->assertArrayHasKey('bar', $parameters);
+        $this->assertArrayHasKey('baz', $parameters);
+        $this->assertSame(true, $parameters['foo']->required);
+    }
+
+    /**
+     * @test
+     */
     public function shouldGetExceptionOnMultipleBodyDeclaration()
     {
         $this->expectException(UnexpectedValueException::class);
