@@ -10,7 +10,7 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
-use PHPUnit_Framework_Constraint as Constraint;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * Constraint that asserts that the content-type matches the expected types.

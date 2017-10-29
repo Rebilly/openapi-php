@@ -11,10 +11,8 @@
 namespace Rebilly\OpenAPI;
 
 use Exception;
-use PHPUnit_Framework_Constraint_Exception as ExceptionConstraint;
-use PHPUnit_Framework_Constraint_ExceptionCode as ExceptionCodeConstraint;
-use PHPUnit_Framework_Constraint_ExceptionMessage as ExceptionMessageConstraint;
-use PHPUnit_Framework_TestCase as BaseTestCase;
+use PHPUnit\Framework\Constraint;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 use UnexpectedValueException;
 
 /**
@@ -66,8 +64,8 @@ abstract class TestCase extends BaseTestCase
      */
     final protected function assertException(Exception $expected, Exception $actual)
     {
-        $this->assertThat($actual, new ExceptionConstraint(get_class($expected)));
-        $this->assertThat($actual, new ExceptionCodeConstraint($expected->getCode()));
-        $this->assertThat($actual, new ExceptionMessageConstraint($expected->getMessage()));
+        $this->assertThat($actual, new Constraint\Exception(get_class($expected)));
+        $this->assertThat($actual, new Constraint\ExceptionCode($expected->getCode()));
+        $this->assertThat($actual, new Constraint\ExceptionMessage($expected->getMessage()));
     }
 }

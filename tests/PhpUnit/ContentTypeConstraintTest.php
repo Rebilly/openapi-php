@@ -10,7 +10,7 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
-use PHPUnit_Framework_ExpectationFailedException as Exception;
+use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
 
 /**
@@ -56,7 +56,7 @@ class ContentTypeConstraintTest extends TestCase
     {
         try {
             $this->assertThat('text/json', $this->constraint);
-        } catch (Exception $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertContains($this->constraint->toString(), $e->getMessage());
         }
 
