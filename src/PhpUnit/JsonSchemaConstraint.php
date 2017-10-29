@@ -10,13 +10,13 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
-use PHPUnit_Framework_Constraint as BaseConstraint;
+use PHPUnit\Framework\Constraint\Constraint;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 
 /**
  * Constraint that asserts that the object matches the expected JSON Schema.
  */
-final class JsonSchemaConstraint extends BaseConstraint
+final class JsonSchemaConstraint extends Constraint
 {
     /**
      * @var object

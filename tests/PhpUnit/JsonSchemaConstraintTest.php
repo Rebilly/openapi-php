@@ -10,7 +10,7 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
-use PHPUnit_Framework_ExpectationFailedException as Exception;
+use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
 
 /**
@@ -74,7 +74,7 @@ final class JsonSchemaConstraintTest extends TestCase
 
         try {
             $this->assertThat($json, $this->constraint);
-        } catch (Exception $e) {
+        } catch (ExpectationFailedException $e) {
             $this->assertContains(
                 $error,
                 $e->getMessage(),
