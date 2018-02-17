@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Upgrade minimum of PHP version up to 7.1
 - Upgrade minimum of PHPUnit version up to 7.0
 
 ## [0.2.0] 2017-10-29
