@@ -54,7 +54,7 @@ final class JsonSchemaConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         $this->errors = $this->validator->validate($other, $this->schema);
 
@@ -64,7 +64,7 @@ final class JsonSchemaConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return json_encode($other) . ' ' . $this->toString();
     }
@@ -72,7 +72,7 @@ final class JsonSchemaConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function additionalFailureDescription($other)
+    protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
     }
@@ -80,7 +80,7 @@ final class JsonSchemaConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return "matches defined {$this->context}";
     }

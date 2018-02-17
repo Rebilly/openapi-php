@@ -91,7 +91,7 @@ final class UriConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($uri)
+    protected function matches($uri): bool
     {
         if (!$uri instanceof UriInterface) {
             throw new UnexpectedValueException('The object should implements UriInterface');
@@ -182,7 +182,7 @@ final class UriConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return json_encode((object) $this->normalizeUri($other)) . ' ' . $this->toString();
     }
@@ -190,7 +190,7 @@ final class UriConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function additionalFailureDescription($other)
+    protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
     }
@@ -198,7 +198,7 @@ final class UriConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return 'matches an specified URI parts';
     }

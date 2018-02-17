@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.0] 2018-02-17
+
+### Changed
+
+- Upgrade minimum of PHP version up to 7.1
+- Upgrade minimum of PHPUnit version up to 7.0
+
 ## [0.2.0] 2017-10-29
 
 ### Changed
