@@ -37,7 +37,7 @@ final class ContentTypeConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         return in_array($this->stripParams($other), $this->allowedTypes, true);
     }
@@ -45,7 +45,7 @@ final class ContentTypeConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return 'is an allowed content-type (' . implode(', ', $this->allowedTypes) . ')';
     }

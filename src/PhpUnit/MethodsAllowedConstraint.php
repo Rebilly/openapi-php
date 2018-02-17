@@ -35,7 +35,7 @@ final class MethodsAllowedConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         if (is_string($other)) {
             return in_array(strtoupper($other), $this->allowedMethods);
@@ -47,7 +47,7 @@ final class MethodsAllowedConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return 'matches an allowed methods (' . implode(', ', $this->allowedMethods) . ')';
     }

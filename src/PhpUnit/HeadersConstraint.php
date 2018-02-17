@@ -48,7 +48,7 @@ final class HeadersConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function matches($actualHeaders)
+    protected function matches($actualHeaders): bool
     {
         if (!is_array($actualHeaders)) {
             throw new UnexpectedValueException('Array expected');
@@ -76,7 +76,7 @@ final class HeadersConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return json_encode($other) . ' ' . $this->toString();
     }
@@ -84,7 +84,7 @@ final class HeadersConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    protected function additionalFailureDescription($other)
+    protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
     }
@@ -92,7 +92,7 @@ final class HeadersConstraint extends Constraint
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return 'matches an specified headers schemas';
     }
