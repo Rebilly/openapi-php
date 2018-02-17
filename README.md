@@ -5,7 +5,7 @@
 [![Build Status][ico-travis]][link-travis]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
-[![Code Style][ico-cs]][link-cs]
+<!-- [![Code Style][ico-cs]][link-cs] -->
 [![Total Downloads][ico-downloads]][link-downloads]
 
 ## Install
