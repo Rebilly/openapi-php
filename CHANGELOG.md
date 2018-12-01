@@ -3,6 +3,18 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.4.0] 2018-12-01
+
+### Fixed
+
+- Change type of statuses returned by getResponseCodes from string to int 
+
+## [0.3.1] 2018-02-17
+
+### Changed
+
+- Add phpunit 6.0 fallback version
+
 ## [0.3.0] 2018-02-17
 
 ### Changed
