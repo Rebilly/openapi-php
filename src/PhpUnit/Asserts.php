@@ -145,7 +145,7 @@ trait Asserts
     final protected static function assertResponseDefined(Spec $spec, $template, $method, $status, $msg = '')
     {
         Assert::assertTrue(
-            in_array((string) $status, $spec->getResponseCodes($template, strtolower($method)), true),
+            in_array((int) $status, $spec->getResponseCodes($template, strtolower($method)), true),
             $msg ?: "Operation \"{$method} {$template}\" does not support response code \"{$status}\""
         );
     }

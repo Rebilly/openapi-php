@@ -217,13 +217,16 @@ final class Schema
      * @param string $template
      * @param string $method
      *
-     * @return string[]
+     * @return int[]
      */
     public function getResponseCodes($template, $method)
     {
-        return array_filter(
-            array_keys((array) $this->fetch($this->schema, 'paths', $template, $method, 'responses')),
-            'is_numeric'
+        return array_map(
+            'intval',
+            array_filter(
+                array_keys((array) $this->fetch($this->schema, 'paths', $template, $method, 'responses')),
+                'is_numeric'
+            )
         );
     }
 
