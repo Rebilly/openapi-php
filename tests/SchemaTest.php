@@ -158,7 +158,7 @@ final class SchemaTest extends TestCase
         $this->assertSame(['application/json'], $produces);
 
         $statuses = $spec->getResponseCodes($template, 'get');
-        $this->assertSame(['200'], $statuses);
+        $this->assertSame([200], $statuses);
 
         $responseHeaders = $spec->getResponseHeaderSchemas($template, 'get', 200);
         $this->assertTrue(isset($responseHeaders['Content-Type']));
