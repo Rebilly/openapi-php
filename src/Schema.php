@@ -27,7 +27,7 @@ final class Schema
      */
     public function __construct($schema)
     {
-        if (!(isset($schema->swagger) && $schema->swagger === '2.0')) {
+        if (!(isset($schema->openapi) && $schema->openapi === '3.0.0')) {
             throw new UnexpectedValueException('Unsupported OpenAPI Specification schema');
         }
 
