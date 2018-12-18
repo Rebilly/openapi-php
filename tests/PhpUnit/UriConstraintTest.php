@@ -15,27 +15,17 @@ use GuzzleHttp\Psr7\Uri;
 use Rebilly\OpenAPI\TestCase;
 use Rebilly\OpenAPI\UnexpectedValueException;
 
-/**
- * Class UriConstraintTest.
- */
 class UriConstraintTest extends TestCase
 {
-    /**
-     * @var UriConstraint
-     */
+    /** @var UriConstraint */
     private $constraint;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->constraint = new UriConstraint(
-            ['https'],
-            'api.example.com',
-            '/v1',
+            ['https://api.example.com/v1'],
             '/posts/{id}',
             [
                 'id' => [
@@ -55,33 +45,27 @@ class UriConstraintTest extends TestCase
     /**
      * @test
      */
-    public function assertValidUri()
+    public function assertValidUri(): void
     {
         $uri = new Uri('https://api.example.com/v1/posts/1?q=');
-
         $this->assertThat($uri, $this->constraint);
     }
 
     /**
      * @test
      */
-    public function passUnexpectedInstance()
+    public function passUnexpectedInstance(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('The object should implements UriInterface');
-
+        $this->expectExceptionObject(new UnexpectedValueException('The object should implements UriInterface'));
         $uri = 'https://api.example.com/v1/posts';
-
         $this->assertThat($uri, $this->constraint);
     }
 
     /**
      * @test
      * @dataProvider provideInvalidUri
-     *
-     * @param Uri $uri
      */
-    public function assertInvalidJson(Uri $uri)
+    public function assertInvalidJson(Uri $uri): void
     {
         $error = $this->getDataSetName();
 
@@ -100,16 +84,10 @@ class UriConstraintTest extends TestCase
         }
     }
 
-    public function provideInvalidUri()
+    public function provideInvalidUri(): array
     {
         return [
-            'Unsupported scheme' => [
-                new Uri('http://api.example.com/v1/posts'),
-            ],
-            'Unexpected host' => [
-                new Uri('https://example.com/v1/posts'),
-            ],
-            'Unexpected base path' => [
+            'Unexpected URL, does not found in defined servers' => [
                 new Uri('https://api.example.com/v2/posts'),
             ],
             'Missing path segment' => [
