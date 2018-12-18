@@ -36,7 +36,7 @@
               }
             },
             "headers": {
-              "Allow": {"$ref": "#/components/headers/Allow"}
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
             }
           }
         }
@@ -54,6 +54,9 @@
         "responses": {
           "201": {
             "description": "Post response",
+            "headers": {
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
+            },
             "content": {
               "application/json": {
                 "schema": {"$ref": "#/components/schemas/Post"}
@@ -80,6 +83,9 @@
       },
       "get": {
         "description": "Returns post by ID",
+        "parameters": [
+          {"$ref": "#/components/parameters/fields"}
+        ],
         "responses": {
           "200": {
             "description": "Post response",
@@ -205,6 +211,14 @@
       "queryString": {
         "description": "Search query string",
         "name": "q",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "fields": {
+        "description": "Filter resource fields",
+        "name": "fields",
         "in": "query",
         "schema": {
           "type": "string"
