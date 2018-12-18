@@ -10,54 +10,69 @@
 
 namespace Rebilly\OpenAPI;
 
+use InvalidArgumentException;
+use JsonSchema\Exception\UnresolvableJsonPointerException;
+use JsonSchema\SchemaStorage;
+use JsonSchema\Uri\UriResolver;
+use JsonSchema\Uri\UriRetriever;
 use stdClass;
 
 final class Schema
 {
-    private $schema;
+    private $schemaStorage;
 
-    public function __construct(stdClass $schema)
+    private $uri;
+
+    public function __construct(string $uri)
     {
-        if (!(isset($schema->swagger) && $schema->swagger === '2.0')) {
-            throw new UnexpectedValueException('Unsupported OpenAPI Specification schema');
+        if (strpos($uri, '//') === false) {
+            $uri = "file://{$uri}";
         }
 
-        $this->schema = $schema;
+        $schemaStorage = new SchemaStorage(new UriRetriever(), new UriResolver());
+        $schemaStorage->addSchema($uri);
+
+        $this->schemaStorage = $schemaStorage;
+        $this->uri = $uri;
+
+        if ($this->getVersion() !== '3.0.0') {
+            throw new UnexpectedValueException('Unsupported OpenAPI Specification schema');
+        }
     }
 
-    public function getHost(): string
+    public function getVersion(): string
     {
-        return $this->fetch($this->schema, 'host');
+        return $this->fetch('#/openapi');
     }
 
-    public function getBasePath(): string
+    public function getServers(): array
     {
-        return $this->fetch($this->schema, 'basePath');
+        return array_column($this->fetch('#/servers'), 'url');
     }
 
     public function getDefinition(string $name): stdClass
     {
-        return $this->fetch($this->schema, 'definitions', $name);
+        return $this->fetch("#/components/schemas/{$name}");
     }
 
     public function getDefinitionNames(): array
     {
-        return array_keys((array) $this->fetch($this->schema, 'definitions'));
+        return array_keys((array) $this->fetch('#/components/schemas'));
     }
 
-    public function getPathSchema(string $template): stdClass
+    public function getPathSchema(string $path): stdClass
     {
-        return $this->fetch($this->schema, 'paths', $template);
+        return $this->fetch("#/paths/{$this->encode($path)}");
     }
 
     public function getAvailablePaths(): array
     {
-        return array_keys((array) $this->fetch($this->schema, 'paths'));
+        return array_keys((array) $this->fetch('#/paths'));
     }
 
-    public function getAllowedMethods(string $template): array
+    public function getAllowedMethods(string $path): array
     {
-        $schema = $this->getPathSchema($template);
+        $schema = $this->getPathSchema($path);
         $methods = [
             'OPTIONS' => true,
             'HEAD' => isset($schema->get),
@@ -71,254 +86,117 @@ final class Schema
         return array_keys(array_filter($methods));
     }
 
-    /**
-     * The transfer protocol for the operation.
-     * The value overrides the top-level schemes definition.
-     *
-     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operationObject
-     *
-     * @param string $template
-     * @param string $method
-     *
-     * @return string[]
-     */
-    public function getSupportedSchemes($template, $method): array
+    public function getRequestHeaderSchemas(string $path, string $method): array
     {
-        $schemes = $this->fetch(
-            $this->schema,
-            'paths',
-            $template,
-            $method,
-            'schemes'
-        );
-
-        if (!$schemes) {
-            $schemes = $this->fetch($this->schema, 'schemes');
-        }
-
-        return (array) $schemes;
+        return (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/headers");
     }
 
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return object[]
-     */
-    public function getRequestHeaderSchemas(string $template, string $method): array
+    public function getRequestBodySchema(string $path, string $method, string $contentType = null): ?stdClass
     {
-        return $this->getRequestParameters($template, $method, 'header');
-    }
+        $schemas = $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/content");
 
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return object|null
-     */
-    public function getRequestBodySchema($template, $method)
-    {
-        $parameters = $this->getRequestParameters($template, $method, 'body');
-        $count = count($parameters);
-
-        if ($count === 0) {
+        if (empty($schemas)) {
             return null;
         }
 
-        if ($count > 1) {
-            throw new UnexpectedValueException('Multiple body parameters found');
+        if (!$contentType) {
+            return reset($schemas)->schema;
         }
 
-        $body = reset($parameters);
-
-        if (!isset($body->schema)) {
-            throw new UnexpectedValueException('Invalid body parameter definition');
+        if (!isset($schemas[$schemas])) {
+            throw new InvalidArgumentException('Unsupported request content type');
         }
 
-        return $body->schema;
+        return $schemas[$schemas]->schema;
     }
 
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return object[]
-     */
-    public function getRequestPathParameters($template, $method)
+    public function getRequestPathParameters(string $path, string $method): array
     {
-        return $this->getRequestParameters($template, $method, 'path');
+        return $this->getRequestParameters($path, $method, 'path');
     }
 
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return object[]
-     */
-    public function getRequestQueryParameters($template, $method)
+    public function getRequestQueryParameters(string $path, string $method): array
     {
-        return $this->getRequestParameters($template, $method, 'query');
+        return $this->getRequestParameters($path, $method, 'query');
     }
 
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return string[]
-     */
-    public function getRequestContentTypes($template, $method)
+    public function getRequestContentTypes(string $path, string $method): array
     {
-        $items = $this->fetch($this->schema, 'paths', $template, $method, 'consumes');
+        return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/content"));
+    }
 
-        if (!$items) {
-            $items = $this->fetch($this->schema, 'consumes');
+    public function getResponseCodes(string $path, string $method): array
+    {
+        return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses"));
+    }
+
+    public function getResponseContentTypes(string $path, string $method, string $status): array
+    {
+        return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/content"));
+    }
+
+    public function getResponseHeaderSchemas(string $path, string $method, string $status): array
+    {
+        return (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/headers");
+    }
+
+    public function getResponseBodySchema(string $path, string $method, string $status, string $contentType = null): ?stdClass
+    {
+        $schemas = $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/content/{$contentType}");
+
+        if (empty($schemas)) {
+            return null;
         }
 
-        return (array) $items;
-    }
-
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return int[]
-     */
-    public function getResponseCodes($template, $method)
-    {
-        return array_map(
-            'intval',
-            array_filter(
-                array_keys((array) $this->fetch($this->schema, 'paths', $template, $method, 'responses')),
-                'is_numeric'
-            )
-        );
-    }
-
-    /**
-     * @param string $template
-     * @param string $method
-     *
-     * @return string[]
-     */
-    public function getResponseContentTypes($template, $method)
-    {
-        $items = $this->fetch($this->schema, 'paths', $template, $method, 'produces');
-
-        if (!$items) {
-            $items = $this->fetch($this->schema, 'produces');
+        if (!$contentType) {
+            return reset($schemas)->schema;
         }
 
-        return (array) $items;
-    }
-
-    /**
-     * @param string $template
-     * @param string $method
-     * @param string $status
-     *
-     * TODO: Normalize headers list to JSON schema (seems it is validator deals)
-     * TODO: If status does not defined, check default response declaration
-     *
-     * @return object[]
-     */
-    public function getResponseHeaderSchemas($template, $method, $status)
-    {
-        return (array) $this->fetch(
-            $this->schema,
-            'paths',
-            $template,
-            $method,
-            'responses',
-            $status,
-            'headers'
-        );
-    }
-
-    /**
-     * Returns body schema.
-     *
-     * @param string $template
-     * @param string $method
-     * @param string $status
-     *
-     * @return object|null
-     */
-    public function getResponseBodySchema($template, $method, $status)
-    {
-        return $this->fetch(
-            $this->schema,
-            'paths',
-            $template,
-            $method,
-            'responses',
-            $status,
-            'schema'
-        );
-    }
-
-    /**
-     * @param $schema
-     * @param array ...$paths
-     *
-     * @return mixed
-     */
-    private static function fetch($schema, ...$paths)
-    {
-        foreach ($paths as $path) {
-            if (!isset($schema->{$path})) {
-                return null;
-            }
-
-            $schema = $schema->{$path};
+        if (!isset($schemas[$schemas])) {
+            throw new InvalidArgumentException('Unsupported response content type');
         }
 
-        return $schema;
+        return $schemas[$schemas]->schema;
     }
 
-    /**
-     * A list of parameters that are applicable for this operation.
-     *
-     * If a parameter is already defined at the Path Item,
-     * the new definition will override it, but can never remove it.
-     *
-     * @param string $template
-     * @param string $method
-     * @param string $location
-     *
-     * @return object[]
-     */
-    private function getRequestParameters($template, $method, $location)
+    private function fetch(string $path)
     {
-        $path = $this->fetch($this->schema, 'paths', $template);
+        try {
+            return $this->schemaStorage->resolveRef(sprintf("%s%s", $this->uri, $path));
+        } catch (UnresolvableJsonPointerException $e) {
+            return null;
+        }
+    }
 
+    private function encode(string $path): string
+    {
+        return strtr($path, ['/' => '~1', '~' => '~0', '%' => '%25']);
+    }
+
+    private function getRequestParameters(string $path, string $method, string $location): array
+    {
         $operationParameters = $this->normalizeRequestParameters(
-            (array) $this->fetch($path, $method, 'parameters'),
+            (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/parameters"),
             $location
         );
 
         $pathParameters = $this->normalizeRequestParameters(
-            (array) $this->fetch($path, 'parameters'),
+            (array) $this->fetch("#/paths/{$this->encode($path)}/parameters"),
             $location
         );
 
         return $operationParameters + $pathParameters;
     }
 
-    /**
-     * Normalizes parameters definitions.
-     *
-     * Filter parameters by location, and use name as list index.
-     *
-     * @param array $parameters
-     * @param string $location
-     *
-     * @return object[]
-     */
-    private function normalizeRequestParameters(array $parameters, $location)
+    private function normalizeRequestParameters(array $parameters, string $location): array
     {
         $schemas = [];
 
-        foreach ($parameters as $parameter) {
+        foreach ($parameters as &$parameter) {
+            if (isset($parameter->{'$ref'})) {
+                $parameter = $this->schemaStorage->resolveRef($parameter->{'$ref'});
+            }
+
             if ($parameter->in !== $location) {
                 continue;
             }
