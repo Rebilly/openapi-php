@@ -10,15 +10,12 @@
 
 namespace Rebilly\OpenAPI;
 
-/**
- * Class SchemaTest.
- */
 final class SchemaTest extends TestCase
 {
     /**
      * @test
      */
-    public function useDefaultFactoryToLoadSchemaByUri()
+    public function useDefaultFactoryToLoadSchemaByUri(): void
     {
         $factory = new SchemaFactory();
         $spec = $factory->create($this->getSchemaSource());
@@ -29,7 +26,7 @@ final class SchemaTest extends TestCase
     /**
      * @test
      */
-    public function createInvalidSchema()
+    public function createInvalidSchema(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Unsupported OpenAPI Specification schema');
@@ -48,10 +45,8 @@ final class SchemaTest extends TestCase
 
     /**
      * @test
-     *
-     * @return Schema
      */
-    public function createSchema()
+    public function createSchema(): Schema
     {
         $spec = new Schema(
             $this->createObject(
@@ -105,10 +100,8 @@ final class SchemaTest extends TestCase
     /**
      * @test
      * @depends createSchema
-     *
-     * @param Schema $spec
      */
-    public function howToUseSwagger(Schema $spec)
+    public function howToUseSwagger(Schema $spec): void
     {
         $this->assertSame('localhost', $spec->getHost());
         $this->assertSame('/v1', $spec->getBasePath());
@@ -170,7 +163,7 @@ final class SchemaTest extends TestCase
     /**
      * @test
      */
-    public function shouldGetUnionOfParameters()
+    public function shouldGetUnionOfParameters(): void
     {
         $spec = new Schema(
             $this->createObject(
@@ -221,7 +214,7 @@ final class SchemaTest extends TestCase
     /**
      * @test
      */
-    public function shouldGetExceptionOnMultipleBodyDeclaration()
+    public function shouldGetExceptionOnMultipleBodyDeclaration(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Multiple body parameters found');
@@ -256,7 +249,7 @@ final class SchemaTest extends TestCase
     /**
      * @test
      */
-    public function shouldGetExceptionOnMultipleParametersDeclaration()
+    public function shouldGetExceptionOnMultipleParametersDeclaration(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Multiple parameters found');
@@ -291,7 +284,7 @@ final class SchemaTest extends TestCase
     /**
      * @test
      */
-    public function shouldGetExceptionOnInvalidRequestBodyDeclaration()
+    public function shouldGetExceptionOnInvalidRequestBodyDeclaration(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid body parameter definition');

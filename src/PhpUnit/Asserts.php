@@ -11,11 +11,11 @@
 namespace Rebilly\OpenAPI\PhpUnit;
 
 use PHPUnit\Framework\Assert;
-use Psr\Http\Message\RequestInterface as Request;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\StreamInterface as Stream;
-use Psr\Http\Message\UriInterface as Uri;
-use Rebilly\OpenAPI\Schema as Spec;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
+use Rebilly\OpenAPI\Schema;
 
 /**
  * Asserts data against OpenAPI specification.
@@ -33,12 +33,12 @@ trait Asserts
      * - Assert headers declared by parameters (header)
      * - Assert body declared by parameters (body)
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
-     * @param Request $request
+     * @param RequestInterface $request
      * @param string $msg
      */
-    final protected static function assertRequest(Spec $spec, $template, Request $request, $msg = '')
+    final protected static function assertRequest(Schema $spec, $template, RequestInterface $request, $msg = '')
     {
         self::assertMethodAllowed($spec, $template, $request->getMethod(), $msg);
         self::assertUri($spec, $template, $request->getMethod(), $request->getUri(), $msg);
@@ -56,13 +56,13 @@ trait Asserts
      * - Assert headers
      * - Assert body
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
-     * @param Response $response
+     * @param ResponseInterface $response
      * @param string $msg
      */
-    final protected static function assertResponse(Spec $spec, $template, $method, Response $response, $msg = '')
+    final protected static function assertResponse(Schema $spec, $template, $method, ResponseInterface $response, $msg = '')
     {
         self::assertResponseDefined($spec, $template, $method, $response->getStatusCode(), $msg);
         self::assertResponseHeaders(
@@ -94,13 +94,13 @@ trait Asserts
      * - Assert URI path matches defined template and path parameters
      * - Assert URI path matches defined query parameters
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
-     * @param Uri $uri
+     * @param UriInterface $uri
      * @param string $msg
      */
-    final protected static function assertUri(Spec $spec, $template, $method, Uri $uri, $msg = '')
+    final protected static function assertUri(Schema $spec, $template, $method, UriInterface $uri, $msg = '')
     {
         Assert::assertThat(
             $uri,
@@ -119,12 +119,12 @@ trait Asserts
     /**
      * Assert the endpoint supports given operation.
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param string $msg
      */
-    final protected static function assertMethodAllowed(Spec $spec, $template, $method, $msg = '')
+    final protected static function assertMethodAllowed(Schema $spec, $template, $method, $msg = '')
     {
         Assert::assertThat(
             $method,
@@ -136,13 +136,13 @@ trait Asserts
     /**
      * Assert the response status code defined.
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param string $status
      * @param string $msg
      */
-    final protected static function assertResponseDefined(Spec $spec, $template, $method, $status, $msg = '')
+    final protected static function assertResponseDefined(Schema $spec, $template, $method, $status, $msg = '')
     {
         Assert::assertTrue(
             in_array((int) $status, $spec->getResponseCodes($template, strtolower($method)), true),
@@ -153,13 +153,13 @@ trait Asserts
     /**
      * Assert the endpoint supports given operation.
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param string $contentType
      * @param string $msg
      */
-    final protected static function assertRequestContentType(Spec $spec, $template, $method, $contentType, $msg = '')
+    final protected static function assertRequestContentType(Schema $spec, $template, $method, $contentType, $msg = '')
     {
         Assert::assertThat(
             $contentType,
@@ -171,13 +171,13 @@ trait Asserts
     /**
      * Assert the endpoint supports given operation.
      *
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param string $contentType
      * @param string $msg
      */
-    final protected static function assertResponseContentType(Spec $spec, $template, $method, $contentType, $msg = '')
+    final protected static function assertResponseContentType(Schema $spec, $template, $method, $contentType, $msg = '')
     {
         Assert::assertThat(
             $contentType,
@@ -187,13 +187,13 @@ trait Asserts
     }
 
     /**
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param array $headers
      * @param string $msg
      */
-    final protected static function assertRequestHeaders(Spec $spec, $template, $method, array $headers, $msg = '')
+    final protected static function assertRequestHeaders(Schema $spec, $template, $method, array $headers, $msg = '')
     {
         Assert::assertThat(
             $headers,
@@ -213,14 +213,14 @@ trait Asserts
     }
 
     /**
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param string $status
      * @param array $headers
      * @param string $msg
      */
-    final protected static function assertResponseHeaders(Spec $spec, $template, $method, $status, array $headers, $msg = '')
+    final protected static function assertResponseHeaders(Schema $spec, $template, $method, $status, array $headers, $msg = '')
     {
         Assert::assertThat(
             $headers,
@@ -254,13 +254,13 @@ trait Asserts
     }
 
     /**
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
-     * @param Stream|null $body
+     * @param StreamInterface|null $body
      * @param string $msg
      */
-    final protected static function assertRequestBody(Spec $spec, $template, $method, Stream $body = null, $msg = '')
+    final protected static function assertRequestBody(Schema $spec, $template, $method, StreamInterface $body = null, $msg = '')
     {
         $schema = $spec->getRequestBodySchema($template, strtolower($method));
 
@@ -276,14 +276,14 @@ trait Asserts
     }
 
     /**
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $template
      * @param string $method
      * @param string $status
-     * @param Stream|null $body
+     * @param StreamInterface|null $body
      * @param string $msg
      */
-    final protected static function assertResponseBody(Spec $spec, $template, $method, $status, Stream $body = null, $msg = '')
+    final protected static function assertResponseBody(Schema $spec, $template, $method, $status, StreamInterface $body = null, $msg = '')
     {
         $schema = $spec->getResponseBodySchema($template, strtolower($method), $status);
 
@@ -299,12 +299,12 @@ trait Asserts
     }
 
     /**
-     * @param Spec $spec
+     * @param Schema $spec
      * @param string $class
      * @param mixed $actual
      * @param string $msg
      */
-    final protected static function assertDefinitionSchema(Spec $spec, $class, $actual, $msg = '')
+    final protected static function assertDefinitionSchema(Schema $spec, $class, $actual, $msg = '')
     {
         Assert::assertThat(
             $actual,

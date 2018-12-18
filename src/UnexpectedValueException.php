@@ -12,9 +12,6 @@ namespace Rebilly\OpenAPI;
 
 use UnexpectedValueException as BaseException;
 
-/**
- * Class UnexpectedValueException.
- */
 final class UnexpectedValueException extends BaseException implements Exception
 {
 }

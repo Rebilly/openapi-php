@@ -14,9 +14,10 @@
   "minimum-stability": "stable",
   "require": {
     "php": "^7.1",
+    "ext-json": "*",
     "psr/http-message": "^1.0",
     "phpunit/phpunit": "^6.0 | ^7.0",
-    "justinrainbow/json-schema": "~2.0"
+    "justinrainbow/json-schema": "~5.2"
   },
   "autoload": {
     "psr-4": {
