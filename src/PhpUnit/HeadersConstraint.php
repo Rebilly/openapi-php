@@ -40,9 +40,7 @@ final class HeadersConstraint extends Constraint
             throw new UnexpectedValueException('Array expected');
         }
 
-        foreach ($this->expectedHeadersSchemas as $name => $definition) {
-            $expectedSchema = $definition->schema;
-
+        foreach ($this->expectedHeadersSchemas as $name => $expectedSchema) {
             if (isset($actualHeaders[$name])) {
                 $errors = $this->validator->validate(
                     $this->normalizeHeaderValue($actualHeaders[$name], $expectedSchema->type),
