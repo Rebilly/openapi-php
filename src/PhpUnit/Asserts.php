@@ -16,6 +16,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Rebilly\OpenAPI\Schema;
+use stdClass;
 
 /**
  * Asserts data against OpenAPI specification.
@@ -32,18 +33,13 @@ trait Asserts
      * - Assert content-type declared by consumes
      * - Assert headers declared by parameters (header)
      * - Assert body declared by parameters (body)
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param RequestInterface $request
-     * @param string $msg
      */
-    final protected static function assertRequest(Schema $spec, $template, RequestInterface $request, $msg = '')
+    final protected static function assertRequest(Schema $schema, string $path, RequestInterface $request, string $msg = ''): void
     {
-        self::assertMethodAllowed($spec, $template, $request->getMethod(), $msg);
-        self::assertUri($spec, $template, $request->getMethod(), $request->getUri(), $msg);
-        self::assertRequestHeaders($spec, $template, $request->getMethod(), $request->getHeaders(), $msg);
-        self::assertRequestBody($spec, $template, $request->getMethod(), $request->getBody(), $msg);
+        self::assertMethodAllowed($schema, $path, $request->getMethod(), $msg);
+        self::assertUri($schema, $path, $request->getMethod(), $request->getUri(), $msg);
+        self::assertRequestHeaders($schema, $path, $request->getMethod(), $request->getHeaders(), $msg);
+        self::assertRequestBody($schema, $path, $request->getMethod(), $request->getBody(), $msg);
     }
 
     /**
@@ -55,27 +51,21 @@ trait Asserts
      * - Assert content-type declared by produces from operation
      * - Assert headers
      * - Assert body
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param ResponseInterface $response
-     * @param string $msg
      */
-    final protected static function assertResponse(Schema $spec, $template, $method, ResponseInterface $response, $msg = '')
+    final protected static function assertResponse(Schema $schema, string $path, string $method, ResponseInterface $response, string $msg = ''): void
     {
-        self::assertResponseDefined($spec, $template, $method, $response->getStatusCode(), $msg);
+        self::assertResponseDefined($schema, $path, $method, $response->getStatusCode(), $msg);
         self::assertResponseHeaders(
-            $spec,
-            $template,
+            $schema,
+            $path,
             $method,
             $response->getStatusCode(),
             $response->getHeaders(),
             $msg
         );
         self::assertResponseBody(
-            $spec,
-            $template,
+            $schema,
+            $path,
             $method,
             $response->getStatusCode(),
             $response->getBody(),
@@ -93,24 +83,16 @@ trait Asserts
      * - Assert URI path starts with defined base path
      * - Assert URI path matches defined template and path parameters
      * - Assert URI path matches defined query parameters
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param UriInterface $uri
-     * @param string $msg
      */
-    final protected static function assertUri(Schema $spec, $template, $method, UriInterface $uri, $msg = '')
+    final protected static function assertUri(Schema $schema, string $path, string $method, UriInterface $uri, string $msg = ''): void
     {
         Assert::assertThat(
             $uri,
             new UriConstraint(
-                $spec->getSupportedSchemes($template, $method),
-                $spec->getHost(),
-                $spec->getBasePath(),
-                $template,
-                $spec->getRequestPathParameters($template, $method),
-                $spec->getRequestQueryParameters($template, $method)
+                $schema->getServers(),
+                $path,
+                $schema->getRequestPathParameters($path, $method),
+                $schema->getRequestQueryParameters($path, $method)
             ),
             $msg
         );
@@ -118,93 +100,63 @@ trait Asserts
 
     /**
      * Assert the endpoint supports given operation.
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param string $msg
      */
-    final protected static function assertMethodAllowed(Schema $spec, $template, $method, $msg = '')
+    final protected static function assertMethodAllowed(Schema $schema, string $path, string $method, string $msg = ''): void
     {
         Assert::assertThat(
             $method,
-            new MethodsAllowedConstraint($spec->getAllowedMethods($template)),
+            new MethodsAllowedConstraint($schema->getAllowedMethods($path)),
             $msg
         );
     }
 
     /**
      * Assert the response status code defined.
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param string $status
-     * @param string $msg
      */
-    final protected static function assertResponseDefined(Schema $spec, $template, $method, $status, $msg = '')
+    final protected static function assertResponseDefined(Schema $schema, string $template, string $method, string $status, string $msg = ''): void
     {
         Assert::assertTrue(
-            in_array((int) $status, $spec->getResponseCodes($template, strtolower($method)), true),
+            $schema->isResponseDefined($template, strtolower($method), $status),
             $msg ?: "Operation \"{$method} {$template}\" does not support response code \"{$status}\""
         );
     }
 
     /**
      * Assert the endpoint supports given operation.
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param string $contentType
-     * @param string $msg
      */
-    final protected static function assertRequestContentType(Schema $spec, $template, $method, $contentType, $msg = '')
+    final protected static function assertRequestContentType(Schema $schema, string $path, string $method, string $contentType, string $msg = ''): void
     {
         Assert::assertThat(
             $contentType,
-            new ContentTypeConstraint($spec->getRequestContentTypes($template, $method)),
+            new ContentTypeConstraint($schema->getRequestContentTypes($path, $method)),
             $msg
         );
     }
 
     /**
      * Assert the endpoint supports given operation.
-     *
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param string $contentType
-     * @param string $msg
      */
-    final protected static function assertResponseContentType(Schema $spec, $template, $method, $contentType, $msg = '')
+    final protected static function assertResponseContentType(Schema $schema, string $path, string $method, string $status, string $contentType, string $msg = ''): void
     {
         Assert::assertThat(
             $contentType,
-            new ContentTypeConstraint($spec->getResponseContentTypes($template, $method)),
+            new ContentTypeConstraint($schema->getResponseContentTypes($path, $method, $status)),
             $msg
         );
     }
 
-    /**
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param array $headers
-     * @param string $msg
-     */
-    final protected static function assertRequestHeaders(Schema $spec, $template, $method, array $headers, $msg = '')
+    final protected static function assertRequestHeaders(Schema $schema, string $path, string $method, array $headers, string $msg = ''): void
     {
         Assert::assertThat(
             $headers,
-            new HeadersConstraint($spec->getRequestHeaderSchemas($template, strtolower($method))),
+            new HeadersConstraint($schema->getRequestHeaderSchemas($path, strtolower($method))),
             $msg
         );
 
-        if (isset($headers['Content-Type'][0])) {
+        if ($schema->isRequestBodyDefined($path, $method) && isset($headers['Content-Type'][0])) {
             self::assertRequestContentType(
-                $spec,
-                $template,
+                $schema,
+                $path,
                 strtolower($method),
                 $headers['Content-Type'][0],
                 $msg
@@ -212,29 +164,22 @@ trait Asserts
         }
     }
 
-    /**
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param string $status
-     * @param array $headers
-     * @param string $msg
-     */
-    final protected static function assertResponseHeaders(Schema $spec, $template, $method, $status, array $headers, $msg = '')
+    final protected static function assertResponseHeaders(Schema $schema, string $path, string $method, string $status, array $headers, string $msg = ''): void
     {
         Assert::assertThat(
             $headers,
             new HeadersConstraint(
-                $spec->getResponseHeaderSchemas($template, strtolower($method), $status)
+                $schema->getResponseHeaderSchemas($path, strtolower($method), $status)
             ),
             $msg
         );
 
-        if (isset($headers['Content-Type'][0])) {
+        if ($schema->isResponseBodyDefined($path, $method, $status) && isset($headers['Content-Type'][0])) {
             self::assertResponseContentType(
-                $spec,
-                $template,
+                $schema,
+                $path,
                 $method,
+                $status,
                 $headers['Content-Type'][0],
                 $msg
             );
@@ -247,27 +192,20 @@ trait Asserts
 
             Assert::assertThat(
                 $headers['Allow'],
-                new MethodsAllowedConstraint($spec->getAllowedMethods($template)),
+                new MethodsAllowedConstraint($schema->getAllowedMethods($path)),
                 $msg
             );
         }
     }
 
-    /**
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param StreamInterface|null $body
-     * @param string $msg
-     */
-    final protected static function assertRequestBody(Schema $spec, $template, $method, StreamInterface $body = null, $msg = '')
+    final protected static function assertRequestBody(Schema $schema, string $path, string $method, StreamInterface $body = null, string $msg = ''): void
     {
-        $schema = $spec->getRequestBodySchema($template, strtolower($method));
+        $bodySchema = $schema->getRequestBodySchema($path, strtolower($method));
 
-        if ($schema) {
+        if ($bodySchema) {
             Assert::assertThat(
                 json_decode($body),
-                new JsonSchemaConstraint($schema, 'request body'),
+                new JsonSchemaConstraint($bodySchema, 'request body'),
                 $msg
             );
         } else {
@@ -275,22 +213,14 @@ trait Asserts
         }
     }
 
-    /**
-     * @param Schema $spec
-     * @param string $template
-     * @param string $method
-     * @param string $status
-     * @param StreamInterface|null $body
-     * @param string $msg
-     */
-    final protected static function assertResponseBody(Schema $spec, $template, $method, $status, StreamInterface $body = null, $msg = '')
+    final protected static function assertResponseBody(Schema $schema, string $path, string $method, string $status, StreamInterface $body = null, string $msg = ''): void
     {
-        $schema = $spec->getResponseBodySchema($template, strtolower($method), $status);
+        $bodySchema = $schema->getResponseBodySchema($path, strtolower($method), $status);
 
-        if ($schema) {
+        if ($bodySchema) {
             Assert::assertThat(
                 json_decode($body),
-                new JsonSchemaConstraint($schema, 'response body'),
+                new JsonSchemaConstraint($bodySchema, 'response body'),
                 $msg
             );
         } else {
@@ -298,17 +228,11 @@ trait Asserts
         }
     }
 
-    /**
-     * @param Schema $spec
-     * @param string $class
-     * @param mixed $actual
-     * @param string $msg
-     */
-    final protected static function assertDefinitionSchema(Schema $spec, $class, $actual, $msg = '')
+    final protected static function assertDefinitionSchema(Schema $schema, string $class, stdClass $actual, string $msg = ''): void
     {
         Assert::assertThat(
             $actual,
-            new JsonSchemaConstraint($spec->getDefinition($class)),
+            new JsonSchemaConstraint($schema->getDefinition($class)),
             $msg
         );
     }
