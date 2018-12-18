@@ -40,7 +40,9 @@ final class HeadersConstraint extends Constraint
             throw new UnexpectedValueException('Array expected');
         }
 
-        foreach ($this->expectedHeadersSchemas as $name => $expectedSchema) {
+        foreach ($this->expectedHeadersSchemas as $name => $definition) {
+            $expectedSchema = $definition->schema;
+
             if (isset($actualHeaders[$name])) {
                 $errors = $this->validator->validate(
                     $this->normalizeHeaderValue($actualHeaders[$name], $expectedSchema->type),
@@ -76,7 +78,7 @@ final class HeadersConstraint extends Constraint
 
     private static function normalizeJsonSchema($schema): stdClass
     {
-        return (object) $schema;
+        return json_decode(json_encode($schema));
     }
 
     /**

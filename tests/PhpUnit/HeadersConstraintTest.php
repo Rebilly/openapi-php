@@ -26,18 +26,24 @@ class HeadersConstraintTest extends TestCase
         $this->constraint = new HeadersConstraint(
             [
                 'Content-Type' => [
-                    'type' => 'string',
-                    'required' => true,
+                    'schema' => [
+                        'type' => 'string',
+                        'required' => true,
+                    ],
                 ],
                 'Allow' => [
-                    'type' => 'array',
-                    'minItems' => 2,
-                    'items' => [
-                        'type' => 'string',
+                    'schema' => [
+                        'type' => 'array',
+                        'minItems' => 2,
+                        'items' => [
+                            'type' => 'string',
+                        ],
                     ],
                 ],
                 'X-Timestamp' => [
-                    'type' => 'integer',
+                    'schema' => [
+                        'type' => 'integer',
+                    ],
                 ],
             ]
         );
