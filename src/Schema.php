@@ -88,7 +88,7 @@ final class Schema
 
     public function getRequestHeaderSchemas(string $path, string $method): array
     {
-        return (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/headers");
+        return $this->getRequestParameters($path, $method, 'header');
     }
 
     public function getRequestBodySchema(string $path, string $method, string $contentType = null): ?stdClass
@@ -125,9 +125,9 @@ final class Schema
         return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/content"));
     }
 
-    public function getResponseCodes(string $path, string $method): array
+    public function isResponseDefined(string $path, string $method, string $status): bool
     {
-        return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses"));
+        return $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}") !== null;
     }
 
     public function getResponseContentTypes(string $path, string $method, string $status): array
@@ -137,6 +137,7 @@ final class Schema
 
     public function getResponseHeaderSchemas(string $path, string $method, string $status): array
     {
+        // TODO: The parameters also have the headers :/
         return (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/headers");
     }
 
@@ -203,6 +204,10 @@ final class Schema
 
             if (isset($schemas[$parameter->name])) {
                 throw new UnexpectedValueException('Multiple parameters found');
+            }
+
+            if (isset($parameter->schema->{'$ref'})) {
+                $parameter->schema = $this->schemaStorage->resolveRef($parameter->schema->{'$ref'});
             }
 
             $schemas[$parameter->name] = clone $parameter;

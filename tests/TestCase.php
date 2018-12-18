@@ -21,9 +21,9 @@ abstract class TestCase extends Framework\TestCase
         return __DIR__ . '/Doubles/openapi3.json';
     }
 
-    protected function getSchemaFactory(): SchemaFactory
+    protected function getSchema(): Schema
     {
-        return new SchemaFactory();
+        return new Schema($this->getSchemaSource());
     }
 
     final protected function createObject(array $array): stdClass

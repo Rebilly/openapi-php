@@ -69,8 +69,8 @@ final class SchemaTest extends TestCase
         $produces = $schema->getResponseContentTypes($path, 'get', '200');
         $this->assertSame(['application/json'], $produces);
 
-        $statuses = $schema->getResponseCodes($path, 'get');
-        $this->assertSame([200], $statuses);
+        $this->assertTrue($schema->isResponseDefined($path, 'get', '200'));
+        $this->assertFalse($schema->isResponseDefined($path, 'get', '201'));
 
         $responseHeaders = $schema->getResponseHeaderSchemas($path, 'get', 200);
         $this->assertArrayHasKey('Content-Type', $responseHeaders);
