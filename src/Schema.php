@@ -35,7 +35,7 @@ final class Schema
         $this->schemaStorage = $schemaStorage;
         $this->uri = $uri;
 
-        if ($this->getVersion() !== '3.0.0') {
+        if (!preg_match('|3\.0(\.\d+)?|', $this->getVersion())) {
             throw new UnexpectedValueException('Unsupported OpenAPI Specification schema');
         }
     }
@@ -62,7 +62,7 @@ final class Schema
 
     public function getPathSchema(string $path): stdClass
     {
-        return $this->fetch("#/paths/{$this->encode($path)}");
+        return $this->fetch("#/paths/{$this->encodePath($path)}");
     }
 
     public function getAvailablePaths(): array
@@ -88,12 +88,24 @@ final class Schema
 
     public function getRequestHeaderSchemas(string $path, string $method): array
     {
-        return $this->getRequestParameters($path, $method, 'header');
+        $parameters = $this->getRequestParameters($path, $method, 'header');
+        $headers = [];
+
+        foreach ($parameters as $parameter) {
+            $headers[] = $parameter->schema;
+        }
+
+        return $headers;
+    }
+
+    public function isRequestBodyDefined(string $path, string $method): bool
+    {
+        return $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/requestBody/content") !== null;
     }
 
     public function getRequestBodySchema(string $path, string $method, string $contentType = null): ?stdClass
     {
-        $schemas = $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/content");
+        $schemas = $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/requestBody/content");
 
         if (empty($schemas)) {
             return null;
@@ -103,11 +115,11 @@ final class Schema
             return reset($schemas)->schema;
         }
 
-        if (!isset($schemas[$schemas])) {
+        if (!isset($schemas->{$contentType})) {
             throw new InvalidArgumentException('Unsupported request content type');
         }
 
-        return $schemas[$schemas]->schema;
+        return $schemas->{$contentType}->schema;
     }
 
     public function getRequestPathParameters(string $path, string $method): array
@@ -122,28 +134,46 @@ final class Schema
 
     public function getRequestContentTypes(string $path, string $method): array
     {
-        return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/requestBody/content"));
+        return array_keys((array) $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/requestBody/content"));
     }
 
     public function isResponseDefined(string $path, string $method, string $status): bool
     {
-        return $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}") !== null;
+        return $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/responses/{$status}") !== null;
+    }
+
+    public function isResponseBodyDefined(string $path, string $method, string $status): bool
+    {
+        return $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/responses/{$status}/content") !== null;
     }
 
     public function getResponseContentTypes(string $path, string $method, string $status): array
     {
-        return array_keys((array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/content"));
+        return array_keys((array) $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/responses/{$status}/content"));
     }
 
     public function getResponseHeaderSchemas(string $path, string $method, string $status): array
     {
-        // TODO: The parameters also have the headers :/
-        return (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/headers");
+        $headers = (array) $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/responses/{$status}/headers");
+
+        foreach ($headers as &$header) {
+            if (isset($header->{'$ref'})) {
+                $header = $this->schemaStorage->resolveRef($header->{'$ref'});
+            }
+
+            if (isset($header->schema->{'$ref'})) {
+                $header->schema = $this->schemaStorage->resolveRef($header->schema->{'$ref'});
+            }
+
+            $header = $header->schema;
+        }
+
+        return $headers;
     }
 
     public function getResponseBodySchema(string $path, string $method, string $status, string $contentType = null): ?stdClass
     {
-        $schemas = $this->fetch("#/paths/{$this->encode($path)}/{$method}/responses/{$status}/content/{$contentType}");
+        $schemas = $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/responses/{$status}/content");
 
         if (empty($schemas)) {
             return null;
@@ -153,11 +183,11 @@ final class Schema
             return reset($schemas)->schema;
         }
 
-        if (!isset($schemas[$schemas])) {
+        if (!isset($schemas->{$contentType})) {
             throw new InvalidArgumentException('Unsupported response content type');
         }
 
-        return $schemas[$schemas]->schema;
+        return $schemas->{$contentType}->schema;
     }
 
     private function fetch(string $path)
@@ -169,20 +199,25 @@ final class Schema
         }
     }
 
-    private function encode(string $path): string
+    private function encodePath(string $path): string
     {
         return strtr($path, ['/' => '~1', '~' => '~0', '%' => '%25']);
+    }
+
+    private function normalizeMethod(string $method): string
+    {
+        return strtolower($method);
     }
 
     private function getRequestParameters(string $path, string $method, string $location): array
     {
         $operationParameters = $this->normalizeRequestParameters(
-            (array) $this->fetch("#/paths/{$this->encode($path)}/{$method}/parameters"),
+            (array) $this->fetch("#/paths/{$this->encodePath($path)}/{$this->normalizeMethod($method)}/parameters"),
             $location
         );
 
         $pathParameters = $this->normalizeRequestParameters(
-            (array) $this->fetch("#/paths/{$this->encode($path)}/parameters"),
+            (array) $this->fetch("#/paths/{$this->encodePath($path)}/parameters"),
             $location
         );
 
@@ -200,10 +235,6 @@ final class Schema
 
             if ($parameter->in !== $location) {
                 continue;
-            }
-
-            if (isset($schemas[$parameter->name])) {
-                throw new UnexpectedValueException('Multiple parameters found');
             }
 
             if (isset($parameter->schema->{'$ref'})) {
