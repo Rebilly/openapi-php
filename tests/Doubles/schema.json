@@ -8,11 +8,11 @@
     "contact": {
       "name": "Veaceslav medvedev",
       "email": "slavcopost@gmail.com",
-      "url": "https://github.com/slavcodev/php-swagger/"
+      "url": "https://github.com/Rebilly/openapi-php"
     },
     "license": {
       "name": "MIT",
-      "url": "https://github.com/slavcodev/php-swagger/LICENSE"
+      "url": "https://github.com/Rebilly/openapi-php/LICENSE"
     }
   },
   "externalDocs": {
