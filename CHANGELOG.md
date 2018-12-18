@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.5.0] 2018-12-18
+
+### Changed
+
+- Updated `justinrainbow/json-schema` to version `5.2`
+- Updated `phpunit/phunit` to version `7.5` 
+
 ## [0.4.0] 2018-12-01
 
 ### Fixed
