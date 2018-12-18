@@ -10,13 +10,18 @@
 
 namespace Rebilly\OpenAPI;
 
+use InvalidArgumentException;
+
 final class SchemaTest extends TestCase
 {
     /**
      * @test
      */
-    public function useDefaultFactoryToLoadSchemaByUri(): Schema
+    public function loadSchemaFromFile(): Schema
     {
+        $schema = new Schema(__DIR__ . '/Doubles/openapi_3.0.1.json');
+        $this->assertSame('3.0.1', $schema->getVersion());
+
         $schema = new Schema($this->getSchemaSource());
         $this->assertSame('3.0.0', $schema->getVersion());
 
@@ -25,7 +30,16 @@ final class SchemaTest extends TestCase
 
     /**
      * @test
-     * @depends useDefaultFactoryToLoadSchemaByUri
+     */
+    public function failOnLoadUnsupportedVersion(): void
+    {
+        $this->expectExceptionObject(new UnexpectedValueException('Unsupported OpenAPI Specification schema'));
+        new Schema(__DIR__ . '/Doubles/openapi_3.1.0.json');
+    }
+
+    /**
+     * @test
+     * @depends loadSchemaFromFile
      */
     public function howToUseSwagger(Schema $schema): void
     {
@@ -60,6 +74,16 @@ final class SchemaTest extends TestCase
         $requestBody = $schema->getRequestBodySchema($path, 'post');
         $this->assertNotNull($requestBody);
 
+        $requestBody = $schema->getRequestBodySchema($path, 'post', 'application/json');
+        $this->assertNotNull($requestBody);
+
+        try {
+            $schema->getRequestBodySchema($path, 'post', 'application/xml');
+            $this->fail('Expected failure on unknown request type');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Unsupported request content type', $e->getMessage());
+        }
+
         $requestPathParams = $schema->getRequestPathParameters($path, 'post');
         $this->assertEmpty($requestPathParams);
 
@@ -77,5 +101,15 @@ final class SchemaTest extends TestCase
 
         $responseBody = $schema->getResponseBodySchema($path, 'get', '200');
         $this->assertNotNull($responseBody);
+
+        $responseBody = $schema->getResponseBodySchema($path, 'get', '200', 'application/json');
+        $this->assertNotNull($responseBody);
+
+        try {
+            $schema->getResponseBodySchema($path, 'get', '200', 'application/xml');
+            $this->fail('Expected failure on unknown response type');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Unsupported response content type', $e->getMessage());
+        }
     }
 }
