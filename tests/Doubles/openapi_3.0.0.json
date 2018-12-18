@@ -76,7 +76,8 @@
           "204": {
             "description": "Show endpoint options",
             "headers": {
-              "Allow": {"$ref": "#/components/headers/Allow"}
+              "Allow": {"$ref": "#/components/headers/Allow"},
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
             }
           }
         }
