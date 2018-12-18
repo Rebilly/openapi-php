@@ -84,7 +84,8 @@
       "get": {
         "description": "Returns post by ID",
         "parameters": [
-          {"$ref": "#/components/parameters/fields"}
+          {"$ref": "#/components/parameters/fields"},
+          {"$ref": "#/components/parameters/contentType"}
         ],
         "responses": {
           "200": {
@@ -223,6 +224,12 @@
         "schema": {
           "type": "string"
         }
+      },
+      "contentType": {
+        "description": "Content-Type header",
+        "name": "Content-Type",
+        "in": "header",
+        "schema": {"$ref": "#/components/schemas/Header"}
       }
     },
     "headers": {
