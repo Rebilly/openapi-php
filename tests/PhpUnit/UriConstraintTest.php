@@ -90,6 +90,9 @@ class UriConstraintTest extends TestCase
             'Unexpected URL, does not found in defined servers' => [
                 new Uri('https://api.example.com/v2/posts'),
             ],
+            'Unexpected URI path, does not match the template' => [
+                new Uri('https://api.example.com/v1/posts/1/comments'),
+            ],
             'Missing path segment' => [
                 new Uri('https://api.example.com/v1/comments/1'),
             ],
