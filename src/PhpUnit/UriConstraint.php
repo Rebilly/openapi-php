@@ -23,38 +23,53 @@ use stdClass;
  */
 final class UriConstraint extends Constraint
 {
-    private $allowedSchemes;
+    private $servers;
 
-    private $basePath;
+    private $path;
 
-    private $templateParams;
+    private $pathParameters;
 
-    private $queryParams;
-
-    private $host;
-
-    private $errors = [];
-
-    private $template;
+    private $queryParameters;
 
     private $validator;
 
+    private $errors = [];
+
     public function __construct(
-        array $expectedSchemes,
-        string $host,
-        string $basePath,
-        string $template,
-        array $pathParams,
-        array $queryParams
+        array $servers,
+        string $path,
+        array $pathParameters,
+        array $queryParameters
     ) {
         parent::__construct();
-        $this->allowedSchemes = array_map('strtolower', $expectedSchemes);
-        $this->host = $host;
-        $this->basePath = $basePath;
-        $this->template = $template;
-        $this->templateParams = array_map([$this, 'normalizeJsonSchema'], $pathParams);
-        $this->queryParams = array_map([$this, 'normalizeJsonSchema'], $queryParams);
+        $this->servers = array_map('strtolower', $servers);
+        $this->path = $path;
+        $this->pathParameters = array_map([$this, 'normalizeJsonSchema'], $pathParameters);
+        $this->queryParameters = array_map([$this, 'normalizeJsonSchema'], $queryParameters);
         $this->validator = new Validator('undefined');
+    }
+
+    private function assertPathSegment(string $expectedSegment, string $actualSegment)
+    {
+        if ($actualSegment !== $expectedSegment) {
+            $this->errors[] = [
+                'property' => 'path',
+                'message' => "Missing path segment ({$expectedSegment})",
+            ];
+        }
+    }
+
+    private function assertPathParam(string $expectedSegment, string $actualSegment)
+    {
+        $pathParamSchema = $this->pathParameters[substr($expectedSegment, 1, -1)];
+
+        // TODO: Consider to disallow non-string params in path, that make no sense
+        $actualSegment = $this->normalizeNumericString($actualSegment);
+
+        $this->errors = array_merge(
+            $this->errors,
+            $this->validator->validate($actualSegment, $pathParamSchema, new JsonPointer('#/path'))
+        );
     }
 
     protected function matches($uri): bool
@@ -63,67 +78,54 @@ final class UriConstraint extends Constraint
             throw new UnexpectedValueException('The object should implements UriInterface');
         }
 
-        if (!in_array(strtolower($uri->getScheme()), $this->allowedSchemes, true)) {
-            $this->errors[] = [
-                'property' => 'scheme',
-                'message' => 'Unsupported scheme (' . implode(', ', $this->allowedSchemes) . ')',
-            ];
-        }
+        $baseUrl = null;
 
-        if ($uri->getHost() !== $this->host) {
-            $this->errors[] = [
-                'property' => 'host',
-                'message' => "Unexpected host ({$this->host})",
-            ];
-        }
+        foreach ($this->servers as $serverUrl) {
+            if (strpos((string) $uri, $serverUrl) === 0) {
+                $baseUrl = $serverUrl;
 
-        if (strpos($uri->getPath(), "{$this->basePath}/") !== 0) {
-            $this->errors[] = [
-                'property' => 'basePath',
-                'message' => "Unexpected base path ({$this->basePath})",
-            ];
-        } else {
-            $path = substr($uri->getPath(), strlen($this->basePath) + 1);
-            $actualSegments = $this->splitString('#\/#', $path);
-            $expectedSegments = $this->splitString('#\/#', $this->template);
-
-            if (count($actualSegments) !== count($expectedSegments)) {
-                $this->errors[] = [
-                    'property' => 'path',
-                    'message' => "Unexpected URI path, does not match the template ({$this->template})",
-                ];
-            } else {
-                foreach ($expectedSegments as $i => $expectedSegment) {
-                    $actualSegment = $actualSegments[$i];
-
-                    if (strpos($expectedSegment, '{') === false) {
-                        // Assert path segment
-                        if ($actualSegment !== $expectedSegment) {
-                            $this->errors[] = [
-                                'property' => 'path',
-                                'message' => "Missing path segment ({$expectedSegment})",
-                            ];
-                        }
-                    } else {
-                        // Assert path param
-                        $pathParamSchema = $this->templateParams[substr($expectedSegment, 1, -1)];
-
-                        // TODO: Consider to disallow non-string params in path, that make no sense
-                        $actualSegment = $this->normalizeNumericString($actualSegment);
-
-                        $this->errors = array_merge(
-                            $this->errors,
-                            $this->validator->validate($actualSegment, $pathParamSchema, new JsonPointer('#/path'))
-                        );
-                    }
-                }
+                continue;
             }
+        }
+
+        if ($baseUrl === null) {
+            $this->errors[] = [
+                'property' => 'baseUrl',
+                'message' => sprintf('Unexpected URL, does not found in defined servers (%s)', implode(', ', $this->servers)),
+            ];
+
+            return false;
+        }
+
+        $pathStart = strlen($baseUrl) - strpos($baseUrl, '/', strpos($baseUrl, '://') + 3);
+        $path = substr($uri->getPath(), $pathStart + 1);
+        $actualSegments = $this->splitString('#\/#', $path);
+        $expectedSegments = $this->splitString('#\/#', $this->path);
+
+        if (count($actualSegments) !== count($expectedSegments)) {
+            $this->errors[] = [
+                'property' => 'path',
+                'message' => "Unexpected URI path, does not match the template ({$this->path})",
+            ];
+
+            return false;
+        }
+
+        foreach ($expectedSegments as $i => $expectedSegment) {
+            $actualSegment = $actualSegments[$i];
+            strpos($expectedSegment, '{') === false
+                ? $this->assertPathSegment($expectedSegment, $actualSegment)
+                : $this->assertPathParam($expectedSegment, $actualSegment);
+        }
+
+        if (!empty($this->errors)) {
+            return false;
         }
 
         parse_str($uri->getQuery(), $actualQueryParams);
 
         // TODO: Assert query params
-        foreach ($this->queryParams as $name => $queryParamSchema) {
+        foreach ($this->queryParameters as $name => $queryParamSchema) {
             if (isset($actualQueryParams[$name])) {
                 $actualQueryParam = $actualQueryParams[$name];
 

@@ -15,54 +15,40 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Rebilly\OpenAPI\Schema;
 use Rebilly\OpenAPI\TestCase;
+use stdClass;
 
-/**
- * Class AssertsTest.
- */
 final class AssertsTest extends TestCase
 {
     use Asserts;
 
-    /**
-     * @var Schema
-     */
-    private $spec;
+    /** @var Schema */
+    private $schema;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
-        $this->spec = $this->getSchemaFactory()->create($this->getSchemaSource());
+        $this->schema = $this->getSchema();
     }
 
     /**
      * @test
      * @dataProvider provideValidRequests
-     *
-     * @param string $template
-     * @param Request $request
      */
-    public function validateValidRequest($template, Request $request)
+    public function validateValidRequest(string $path, Request $request): void
     {
-        $this->assertRequest($this->spec, $template, $request);
+        $this->assertRequest($this->schema, $path, $request);
     }
 
     /**
      * @test
      * @dataProvider provideInvalidRequests
-     *
-     * @param string $template
-     * @param Request $request
      */
-    public function validateInvalidRequest($template, Request $request)
+    public function validateInvalidRequest(string $path, Request $request): void
     {
         $error = $this->getDataSetName();
 
         try {
-            $this->assertRequest($this->spec, $template, $request);
+            $this->assertRequest($this->schema, $path, $request);
         } catch (Exception $e) {
             $this->assertContains(
                 $error,
@@ -79,32 +65,22 @@ final class AssertsTest extends TestCase
     /**
      * @test
      * @dataProvider provideValidResponses
-     *
-     * @param string $template
-     * @param string $method
-     * @param Response $response
      */
-    public function validateValidResponse($template, $method, Response $response)
+    public function validateValidResponse(string $path, string $method, Response $response): void
     {
-        $this->assertResponse($this->spec, $template, $method, $response);
+        $this->assertResponse($this->schema, $path, $method, $response);
     }
 
     /**
      * @test
      * @dataProvider provideValidObjects
-     *
-     * @param string $class
-     * @param object $object
      */
-    public function validateValidDefinition($class, $object)
+    public function validateValidDefinition(string $class, stdClass $object): void
     {
-        $this->assertDefinitionSchema($this->spec, $class, $object);
+        $this->assertDefinitionSchema($this->schema, $class, $object);
     }
 
-    /**
-     * @return array
-     */
-    public function provideValidRequests()
+    public function provideValidRequests(): array
     {
         $headers = ['Content-Type' => 'application/json'];
         $body = json_encode(
@@ -122,38 +98,37 @@ final class AssertsTest extends TestCase
         return [
             [
                 '/posts/{id}',
-                new Request('GET', 'http://api.example.com/v1/posts/foo/', $headers),
+                new Request('GET', 'https://api.example.com/v1/posts/foo/', $headers),
             ],
             [
                 '/posts',
-                new Request('POST', 'http://api.example.com/v1/posts/', $headers, $body),
+                new Request('POST', 'https://api.example.com/v1/posts/', $headers, $body),
             ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function provideInvalidRequests()
+    public function provideInvalidRequests(): array
     {
         $headers = ['Content-Type' => 'application/json'];
+        $post = [
+            'title' => 'Hello world',
+            'body' => 'Hi there',
+            'author' => ['name' => 'John Doe', 'email' => 'john@doe.com'],
+        ];
 
         return [
             'Failed asserting that \'POST\' matches an allowed methods' => [
                 '/posts/{id}',
-                new Request('POST', 'http://api.example.com/v1/posts/foo/', $headers),
+                new Request('POST', 'https://api.example.com/v1/posts/foo/', $headers),
             ],
             'Failed asserting that \'text/json\' is an allowed content-type' => [
-                '/posts/{id}',
-                new Request('GET', 'http://api.example.com/v1/posts/foo/', ['Content-Type' => 'text/json']),
+                '/posts',
+                new Request('POST', 'https://api.example.com/v1/posts', ['Content-Type' => 'text/json'], json_encode($post)),
             ],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function provideValidResponses()
+    public function provideValidResponses(): array
     {
         $headers = ['Content-Type' => 'application/json'];
         $body = json_encode(
@@ -187,10 +162,7 @@ final class AssertsTest extends TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function provideValidObjects()
+    public function provideValidObjects(): array
     {
         return [
             [

@@ -1,0 +1,245 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0",
+    "title": "Demo Blog",
+    "description": "A sample blog API to demonstrate swagger-2.0 specification",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "Veaceslav medvedev",
+      "email": "slavcopost@gmail.com",
+      "url": "https://github.com/Rebilly/openapi-php"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/Rebilly/openapi-php/LICENSE"
+    }
+  },
+  "servers": [
+    {"url": "https://api.example.com/v1"}
+  ],
+  "tags": [],
+  "paths": {
+    "/{id}": {"$ref": "#/paths/~1posts~1{id}"},
+    "/posts": {
+      "parameters": [
+        {"$ref": "#/components/parameters/queryString"}
+      ],
+      "get": {
+        "description": "Returns all posts",
+        "responses": {
+          "200": {
+            "description": "Post list response",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Posts"}
+              }
+            },
+            "headers": {
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new post in the blog",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/Post"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post response",
+            "headers": {
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
+            },
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Post"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "parameters": [
+        {"$ref": "#/components/parameters/postId"}
+      ],
+      "options": {
+        "description": "Returns options",
+        "responses": {
+          "204": {
+            "description": "Show endpoint options",
+            "headers": {
+              "Allow": {"$ref": "#/components/headers/Allow"},
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Returns post by ID",
+        "parameters": [
+          {"$ref": "#/components/parameters/fields"},
+          {"$ref": "#/components/parameters/contentType"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Post response",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Post"}
+              }
+            },
+            "headers": {
+              "Content-Type": {"$ref": "#/components/headers/Content-Type"}
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Header": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string"
+        }
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "readOnly": true
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "readOnly": true
+              }
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "comments": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          }
+        },
+        "required": ["title", "body", "author"]
+      },
+      "Posts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Post"
+        }
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": ["name", "email"]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "author": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "text": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "required": ["author", "text"]
+      }
+    },
+    "parameters": {
+      "postId": {
+        "description": "The post ID",
+        "required": true,
+        "name": "id",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "queryString": {
+        "description": "Search query string",
+        "name": "q",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "fields": {
+        "description": "Filter resource fields",
+        "name": "fields",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "contentType": {
+        "description": "Content-Type header",
+        "name": "Content-Type",
+        "in": "header",
+        "schema": {"$ref": "#/components/schemas/Header"}
+      }
+    },
+    "headers": {
+      "Content-Type": {
+        "schema": {"$ref": "#/components/schemas/Header"}
+      },
+      "Allow": {
+        "schema": {"$ref": "#/components/schemas/Header"}
+      }
+    }
+  }
+}

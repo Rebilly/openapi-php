@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.6.0] 2018-12-18
+
+### Changed
+
+- Migrate library to OpenAPI v3.0 format 
+
 ## [0.5.0] 2018-12-18
 
 ### Changed

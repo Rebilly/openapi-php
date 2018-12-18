@@ -18,12 +18,12 @@ abstract class TestCase extends Framework\TestCase
 {
     protected function getSchemaSource(): string
     {
-        return __DIR__ . '/Doubles/schema.json';
+        return __DIR__ . '/Doubles/openapi_3.0.0.json';
     }
 
-    protected function getSchemaFactory(): SchemaFactory
+    protected function getSchema(): Schema
     {
-        return new SchemaFactory();
+        return new Schema($this->getSchemaSource());
     }
 
     final protected function createObject(array $array): stdClass

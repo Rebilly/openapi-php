@@ -14,20 +14,12 @@ use Exception;
 use Rebilly\OpenAPI\TestCase;
 use Rebilly\OpenAPI\UnexpectedValueException;
 
-/**
- * Class HeadersConstraintTest.
- */
 class HeadersConstraintTest extends TestCase
 {
-    /**
-     * @var HeadersConstraint
-     */
+    /** @var HeadersConstraint */
     private $constraint;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -54,18 +46,16 @@ class HeadersConstraintTest extends TestCase
     /**
      * @test
      */
-    public function passUnexpectedValue()
+    public function passUnexpectedValue(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Array expected');
-
+        $this->expectExceptionObject(new UnexpectedValueException('Array expected'));
         $this->assertThat((object) [], $this->constraint);
     }
 
     /**
      * @test
      */
-    public function assertValidHeaders()
+    public function assertValidHeaders(): void
     {
         $headers = [
             'Content-Type' => ['application/json'],
@@ -79,10 +69,8 @@ class HeadersConstraintTest extends TestCase
     /**
      * @test
      * @dataProvider provideInvalidHeaders
-     *
-     * @param array $headers
      */
-    public function assertInvalidHeaders(array $headers)
+    public function assertInvalidHeaders(array $headers): void
     {
         $error = $this->getDataSetName();
 
@@ -101,7 +89,7 @@ class HeadersConstraintTest extends TestCase
         }
     }
 
-    public function provideInvalidHeaders()
+    public function provideInvalidHeaders(): array
     {
         return [
             'Missing required header' => [

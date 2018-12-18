@@ -13,23 +13,14 @@ namespace Rebilly\OpenAPI\PhpUnit;
 use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
 
-/**
- * Class ContentTypeConstraintTest.
- */
 class ContentTypeConstraintTest extends TestCase
 {
-    /**
-     * @var ContentTypeConstraint
-     */
+    /** @var ContentTypeConstraint */
     private $constraint;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
         $this->constraint = new ContentTypeConstraint(
             [
                 'application/json',
@@ -41,10 +32,8 @@ class ContentTypeConstraintTest extends TestCase
     /**
      * @test
      * @dataProvider providerValidTypes
-     *
-     * @param string $type
      */
-    public function assertValidType($type)
+    public function assertValidType(string $type): void
     {
         $this->assertThat($type, $this->constraint);
     }
@@ -52,7 +41,7 @@ class ContentTypeConstraintTest extends TestCase
     /**
      * @test
      */
-    public function assertInvalidType()
+    public function assertInvalidType(): void
     {
         try {
             $this->assertThat('text/json', $this->constraint);
@@ -65,10 +54,7 @@ class ContentTypeConstraintTest extends TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function providerValidTypes()
+    public function providerValidTypes(): array
     {
         return [
             ['application/json'],

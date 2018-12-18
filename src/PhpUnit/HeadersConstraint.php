@@ -76,7 +76,7 @@ final class HeadersConstraint extends Constraint
 
     private static function normalizeJsonSchema($schema): stdClass
     {
-        return (object) $schema;
+        return json_decode(json_encode($schema));
     }
 
     /**

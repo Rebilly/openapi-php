@@ -34,13 +34,6 @@ final class Validator
         $this->context = $context;
     }
 
-    /**
-     * @param mixed $value
-     * @param stdClass $schema
-     * @param JsonPointer|null $path
-     *
-     * @return array
-     */
     public function validate($value, stdClass $schema, JsonPointer $path = null): array
     {
         $this->validator->check($value, $schema, $path);

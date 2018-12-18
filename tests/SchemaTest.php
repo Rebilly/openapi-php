@@ -10,305 +10,106 @@
 
 namespace Rebilly\OpenAPI;
 
+use InvalidArgumentException;
+
 final class SchemaTest extends TestCase
 {
     /**
      * @test
      */
-    public function useDefaultFactoryToLoadSchemaByUri(): void
+    public function loadSchemaFromFile(): Schema
     {
-        $factory = new SchemaFactory();
-        $spec = $factory->create($this->getSchemaSource());
+        $schema = new Schema(__DIR__ . '/Doubles/openapi_3.0.1.json');
+        $this->assertSame('3.0.1', $schema->getVersion());
 
-        $this->assertInstanceOf(Schema::class, $spec);
+        $schema = new Schema($this->getSchemaSource());
+        $this->assertSame('3.0.0', $schema->getVersion());
+
+        return $schema;
     }
 
     /**
      * @test
      */
-    public function createInvalidSchema(): void
+    public function failOnLoadUnsupportedVersion(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Unsupported OpenAPI Specification schema');
-
-        $spec = new Schema(
-            $this->createObject(
-                [
-                    'swagger' => '1.0',
-                    'host' => 'localhost',
-                ]
-            )
-        );
-
-        $this->assertSame('localhost', $spec->getHost());
+        $this->expectExceptionObject(new UnexpectedValueException('Unsupported OpenAPI Specification schema'));
+        new Schema(__DIR__ . '/Doubles/openapi_3.1.0.json');
     }
 
     /**
      * @test
+     * @depends loadSchemaFromFile
      */
-    public function createSchema(): Schema
+    public function howToUseSwagger(Schema $schema): void
     {
-        $spec = new Schema(
-            $this->createObject(
-                [
-                    'swagger' => '2.0',
-                    'host' => 'localhost',
-                    'schemes' => ['https', 'http'],
-                    'consumes' => ['application/json'],
-                    'produces' => ['application/json'],
-                    'basePath' => '/v1',
-                    'definitions' => [
-                        'Post' => [
-                            'type' => 'object',
-                        ],
-                    ],
-                    'paths' => [
-                        '/posts' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'Content-Type',
-                                    'in' => 'header',
-                                    'required' => true,
-                                    'type' => 'string',
-                                ],
-                            ],
-                            'get' => [
-                                'parameters' => [],
-                                'responses' => [
-                                    '200' => [
-                                        'headers' => [
-                                            'Content-Type' => [
-                                                'required' => true,
-                                                'type' => 'string',
-                                            ],
-                                        ],
-                                    ],
-                                    'default' => [],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            )
-        );
+        $this->assertEquals(['https://api.example.com/v1'], $schema->getServers());
 
-        $this->assertSame('localhost', $spec->getHost());
-
-        return $spec;
-    }
-
-    /**
-     * @test
-     * @depends createSchema
-     */
-    public function howToUseSwagger(Schema $spec): void
-    {
-        $this->assertSame('localhost', $spec->getHost());
-        $this->assertSame('/v1', $spec->getBasePath());
-
-        $definitions = $spec->getDefinitionNames();
+        $definitions = $schema->getDefinitionNames();
         $this->assertGreaterThan(0, count($definitions));
 
         foreach ($definitions as $name) {
-            $definition = $spec->getDefinition($name);
+            $definition = $schema->getDefinition($name);
             $this->assertTrue(isset($definition->type));
         }
 
-        $paths = $spec->getAvailablePaths();
+        $paths = $schema->getAvailablePaths();
         $this->assertGreaterThan(0, count($paths));
 
-        foreach ($paths as $template) {
-            $path = $spec->getPathSchema($template);
+        foreach ($paths as $path) {
+            $path = $schema->getPathSchema($path);
             $this->assertNotNull($path);
         }
 
-        $template = reset($paths);
+        $path = '/posts';
+        $methods = $schema->getAllowedMethods($path);
+        $this->assertSame(['OPTIONS', 'HEAD', 'GET', 'POST'], $methods);
 
-        $methods = $spec->getAllowedMethods($template);
-        $this->assertTrue(in_array('OPTIONS', $methods));
-        $this->assertTrue(in_array('HEAD', $methods));
-        $this->assertTrue(in_array('GET', $methods));
-
-        $schemes = $spec->getSupportedSchemes($template, 'get');
-        $this->assertSame(['https', 'http'], $schemes);
-
-        $consumes = $spec->getRequestContentTypes($template, 'get');
+        $consumes = $schema->getRequestContentTypes($path, 'post');
         $this->assertSame(['application/json'], $consumes);
 
-        $requestHeaders = $spec->getRequestHeaderSchemas($template, 'get');
-        $this->assertTrue(isset($requestHeaders['Content-Type']));
-
-        $requestBody = $spec->getRequestBodySchema($template, 'get');
+        $requestBody = $schema->getRequestBodySchema($path, 'get');
         $this->assertNull($requestBody);
 
-        $requestPathParams = $spec->getRequestPathParameters($template, 'get');
+        $requestBody = $schema->getRequestBodySchema($path, 'post');
+        $this->assertNotNull($requestBody);
+
+        $requestBody = $schema->getRequestBodySchema($path, 'post', 'application/json');
+        $this->assertNotNull($requestBody);
+
+        try {
+            $schema->getRequestBodySchema($path, 'post', 'application/xml');
+            $this->fail('Expected failure on unknown request type');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Unsupported request content type', $e->getMessage());
+        }
+
+        $requestPathParams = $schema->getRequestPathParameters($path, 'post');
         $this->assertEmpty($requestPathParams);
 
-        $requestQueryParams = $spec->getRequestQueryParameters($template, 'get');
-        $this->assertEmpty($requestQueryParams);
+        $requestQueryParams = $schema->getRequestQueryParameters($path, 'get');
+        $this->assertCount(1, $requestQueryParams);
 
-        $produces = $spec->getResponseContentTypes($template, 'get');
+        $produces = $schema->getResponseContentTypes($path, 'get', '200');
         $this->assertSame(['application/json'], $produces);
 
-        $statuses = $spec->getResponseCodes($template, 'get');
-        $this->assertSame([200], $statuses);
+        $this->assertTrue($schema->isResponseDefined($path, 'get', '200'));
+        $this->assertFalse($schema->isResponseDefined($path, 'get', '201'));
 
-        $responseHeaders = $spec->getResponseHeaderSchemas($template, 'get', 200);
-        $this->assertTrue(isset($responseHeaders['Content-Type']));
+        $responseHeaders = $schema->getResponseHeaderSchemas($path, 'get', 200);
+        $this->assertArrayHasKey('Content-Type', $responseHeaders);
 
-        $responseBody = $spec->getResponseBodySchema($template, 'get', 200);
-        $this->assertNull($responseBody);
-    }
+        $responseBody = $schema->getResponseBodySchema($path, 'get', '200');
+        $this->assertNotNull($responseBody);
 
-    /**
-     * @test
-     */
-    public function shouldGetUnionOfParameters(): void
-    {
-        $spec = new Schema(
-            $this->createObject(
-                [
-                    'swagger' => '2.0',
-                    'host' => 'localhost',
-                    'paths' => [
-                        '/posts' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'foo',
-                                    'in' => 'header',
-                                    'required' => false,
-                                ],
-                                [
-                                    'name' => 'bar',
-                                    'in' => 'header',
-                                ],
-                            ],
-                            'get' => [
-                                'parameters' => [
-                                    [
-                                        'name' => 'baz',
-                                        'in' => 'header',
-                                    ],
-                                    [
-                                        'name' => 'foo',
-                                        'in' => 'header',
-                                        'required' => true,
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            )
-        );
+        $responseBody = $schema->getResponseBodySchema($path, 'get', '200', 'application/json');
+        $this->assertNotNull($responseBody);
 
-        $parameters = $spec->getRequestHeaderSchemas('/posts', 'get');
-
-        $this->assertCount(3, $parameters);
-        $this->assertArrayHasKey('foo', $parameters);
-        $this->assertArrayHasKey('bar', $parameters);
-        $this->assertArrayHasKey('baz', $parameters);
-        $this->assertSame(true, $parameters['foo']->required);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldGetExceptionOnMultipleBodyDeclaration(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Multiple body parameters found');
-
-        $spec = new Schema(
-            $this->createObject(
-                [
-                    'swagger' => '2.0',
-                    'host' => 'localhost',
-                    'paths' => [
-                        '/posts' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'foo',
-                                    'in' => 'body',
-                                ],
-                                [
-                                    'name' => 'bar',
-                                    'in' => 'body',
-                                ],
-                            ],
-                            'get' => [],
-                        ],
-                    ],
-                ]
-            )
-        );
-
-        $spec->getRequestBodySchema('/posts', 'get');
-    }
-
-    /**
-     * @test
-     */
-    public function shouldGetExceptionOnMultipleParametersDeclaration(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Multiple parameters found');
-
-        $spec = new Schema(
-            $this->createObject(
-                [
-                    'swagger' => '2.0',
-                    'host' => 'localhost',
-                    'paths' => [
-                        '/posts' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'foo',
-                                    'in' => 'header',
-                                ],
-                                [
-                                    'name' => 'foo',
-                                    'in' => 'header',
-                                ],
-                            ],
-                            'get' => [],
-                        ],
-                    ],
-                ]
-            )
-        );
-
-        $spec->getRequestHeaderSchemas('/posts', 'get');
-    }
-
-    /**
-     * @test
-     */
-    public function shouldGetExceptionOnInvalidRequestBodyDeclaration(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Invalid body parameter definition');
-
-        $spec = new Schema(
-            $this->createObject(
-                [
-                    'swagger' => '2.0',
-                    'host' => 'localhost',
-                    'paths' => [
-                        '/posts' => [
-                            'parameters' => [
-                                [
-                                    'name' => 'foo',
-                                    'in' => 'body',
-                                ],
-                            ],
-                            'get' => [],
-                        ],
-                    ],
-                ]
-            )
-        );
-
-        $spec->getRequestBodySchema('/posts', 'get');
+        try {
+            $schema->getResponseBodySchema($path, 'get', '200', 'application/xml');
+            $this->fail('Expected failure on unknown response type');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Unsupported response content type', $e->getMessage());
+        }
     }
 }

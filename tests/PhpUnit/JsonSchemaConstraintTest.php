@@ -13,20 +13,12 @@ namespace Rebilly\OpenAPI\PhpUnit;
 use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
 
-/**
- * Class JsonSchemaConstraintTest.
- */
 final class JsonSchemaConstraintTest extends TestCase
 {
-    /**
-     * @var JsonSchemaConstraint
-     */
+    /** @var JsonSchemaConstraint */
     private $constraint;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -48,7 +40,7 @@ final class JsonSchemaConstraintTest extends TestCase
     /**
      * @test
      */
-    public function assertValidJson()
+    public function assertValidJson(): void
     {
         $json = $this->createObject(
             [
@@ -64,10 +56,8 @@ final class JsonSchemaConstraintTest extends TestCase
     /**
      * @test
      * @dataProvider provideInvalidJson
-     *
-     * @param array $payload
      */
-    public function assertInvalidJson(array $payload)
+    public function assertInvalidJson(array $payload): void
     {
         $json = $this->createObject($payload);
         $error = $this->getDataSetName();
@@ -87,10 +77,7 @@ final class JsonSchemaConstraintTest extends TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function provideInvalidJson()
+    public function provideInvalidJson(): array
     {
         return [
             'The property description is required' => [

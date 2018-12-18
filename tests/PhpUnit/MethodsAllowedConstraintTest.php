@@ -13,33 +13,22 @@ namespace Rebilly\OpenAPI\PhpUnit;
 use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
 
-/**
- * Class MethodsAllowedConstraintTest.
- */
 class MethodsAllowedConstraintTest extends TestCase
 {
-    /**
-     * @var MethodsAllowedConstraint
-     */
+    /** @var MethodsAllowedConstraint */
     private $constraint;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp()
     {
         parent::setUp();
-
         $this->constraint = new MethodsAllowedConstraint(['OPTIONS', 'HEAD', 'GET']);
     }
 
     /**
      * @test
      * @dataProvider providerValidMethods
-     *
-     * @param string $method
      */
-    public function assertValidMethod($method)
+    public function assertValidMethod($method): void
     {
         $this->assertThat($method, $this->constraint);
     }
@@ -47,7 +36,7 @@ class MethodsAllowedConstraintTest extends TestCase
     /**
      * @test
      */
-    public function assertInvalidMethod()
+    public function assertInvalidMethod(): void
     {
         try {
             $this->assertThat('POST', $this->constraint);
@@ -60,10 +49,7 @@ class MethodsAllowedConstraintTest extends TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function providerValidMethods()
+    public function providerValidMethods(): array
     {
         return [
             'Assert single method' => ['GET'],
