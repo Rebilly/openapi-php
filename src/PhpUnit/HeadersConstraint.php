@@ -10,44 +10,30 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
+use JsonSchema\Entity\JsonPointer;
 use PHPUnit\Framework\Constraint\Constraint;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 use Rebilly\OpenAPI\UnexpectedValueException;
+use stdClass;
 
 /**
  * Constraint that asserts that the headers list matches the expected defined schemas.
  */
 final class HeadersConstraint extends Constraint
 {
-    /**
-     * @var array
-     */
     private $errors = [];
 
-    /**
-     * @var array
-     */
     private $expectedHeadersSchemas;
 
-    /**
-     * @var Validator
-     */
     private $validator;
 
-    /**
-     * @param array $expectedHeadersSchemas
-     */
     public function __construct(array $expectedHeadersSchemas)
     {
         parent::__construct();
-
         $this->expectedHeadersSchemas = array_map([$this, 'normalizeJsonSchema'], $expectedHeadersSchemas);
         $this->validator = new Validator('undefined');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function matches($actualHeaders): bool
     {
         if (!is_array($actualHeaders)) {
@@ -59,7 +45,7 @@ final class HeadersConstraint extends Constraint
                 $errors = $this->validator->validate(
                     $this->normalizeHeaderValue($actualHeaders[$name], $expectedSchema->type),
                     $expectedSchema,
-                    $name
+                    new JsonPointer("#/{$name}")
                 );
                 $this->errors = array_merge($this->errors, $errors);
             } elseif (isset($expectedSchema->required) && $expectedSchema->required) {
@@ -73,38 +59,22 @@ final class HeadersConstraint extends Constraint
         return empty($this->errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function failureDescription($other): string
     {
         return json_encode($other) . ' ' . $this->toString();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'matches an specified headers schemas';
     }
 
-    /**
-     * Ensure schema is object.
-     *
-     * @param object|array $schema
-     *
-     * @return object
-     */
-    private static function normalizeJsonSchema($schema)
+    private static function normalizeJsonSchema($schema): stdClass
     {
         return (object) $schema;
     }

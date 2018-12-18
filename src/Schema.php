@@ -10,22 +10,13 @@
 
 namespace Rebilly\OpenAPI;
 
-/**
- * Schema representation.
- */
+use stdClass;
+
 final class Schema
 {
-    /**
-     * Schema definition.
-     *
-     * @var object
-     */
     private $schema;
 
-    /**
-     * @param object $schema
-     */
-    public function __construct($schema)
+    public function __construct(stdClass $schema)
     {
         if (!(isset($schema->swagger) && $schema->swagger === '2.0')) {
             throw new UnexpectedValueException('Unsupported OpenAPI Specification schema');
@@ -34,64 +25,37 @@ final class Schema
         $this->schema = $schema;
     }
 
-    /**
-     * @return string
-     */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->fetch($this->schema, 'host');
     }
 
-    /**
-     * @return string
-     */
-    public function getBasePath()
+    public function getBasePath(): string
     {
         return $this->fetch($this->schema, 'basePath');
     }
 
-    /**
-     * @param string $name
-     *
-     * @return object
-     */
-    public function getDefinition($name)
+    public function getDefinition(string $name): stdClass
     {
         return $this->fetch($this->schema, 'definitions', $name);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getDefinitionNames()
+    public function getDefinitionNames(): array
     {
         return array_keys((array) $this->fetch($this->schema, 'definitions'));
     }
 
-    /**
-     * @param string $template
-     *
-     * @return object
-     */
-    public function getPathSchema($template)
+    public function getPathSchema(string $template): stdClass
     {
         return $this->fetch($this->schema, 'paths', $template);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getAvailablePaths()
+    public function getAvailablePaths(): array
     {
         return array_keys((array) $this->fetch($this->schema, 'paths'));
     }
 
-    /**
-     * @param string $template Schema path template.
-     *
-     * @return string[]
-     */
-    public function getAllowedMethods($template)
+    public function getAllowedMethods(string $template): array
     {
         $schema = $this->getPathSchema($template);
         $methods = [
@@ -118,7 +82,7 @@ final class Schema
      *
      * @return string[]
      */
-    public function getSupportedSchemes($template, $method)
+    public function getSupportedSchemes($template, $method): array
     {
         $schemes = $this->fetch(
             $this->schema,
@@ -141,7 +105,7 @@ final class Schema
      *
      * @return object[]
      */
-    public function getRequestHeaderSchemas($template, $method)
+    public function getRequestHeaderSchemas(string $template, string $method): array
     {
         return $this->getRequestParameters($template, $method, 'header');
     }

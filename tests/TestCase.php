@@ -10,62 +10,33 @@
 
 namespace Rebilly\OpenAPI;
 
-use Exception;
-use PHPUnit\Framework\Constraint;
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use PHPUnit\Framework;
+use stdClass;
 use UnexpectedValueException;
 
-/**
- * Bases for test case.
- */
-abstract class TestCase extends BaseTestCase
+abstract class TestCase extends Framework\TestCase
 {
-    /**
-     * @return string
-     */
-    protected function getSchemaSource()
+    protected function getSchemaSource(): string
     {
         return __DIR__ . '/Doubles/schema.json';
     }
 
-    /**
-     * @return SchemaFactory
-     */
-    protected function getSchemaFactory()
+    protected function getSchemaFactory(): SchemaFactory
     {
         return new SchemaFactory();
     }
 
-    /**
-     * @param array $array
-     *
-     * @return object
-     */
-    final protected function createObject(array $array)
+    final protected function createObject(array $array): stdClass
     {
         return json_decode(json_encode($array));
     }
 
-    /**
-     * @return string
-     */
-    final protected function getDataSetName()
+    final protected function getDataSetName(): string
     {
         if (preg_match('/with data set "(.+)"/i', $this->getName(), $matches) === false) {
             throw new UnexpectedValueException('Data set name not found');
         }
 
         return $matches[1];
-    }
-
-    /**
-     * @param Exception $expected
-     * @param Exception $actual
-     */
-    final protected function assertException(Exception $expected, Exception $actual)
-    {
-        $this->assertThat($actual, new Constraint\Exception(get_class($expected)));
-        $this->assertThat($actual, new Constraint\ExceptionCode($expected->getCode()));
-        $this->assertThat($actual, new Constraint\ExceptionMessage($expected->getMessage()));
     }
 }

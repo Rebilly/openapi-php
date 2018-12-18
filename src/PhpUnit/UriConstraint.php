@@ -10,10 +10,12 @@
 
 namespace Rebilly\OpenAPI\PhpUnit;
 
+use JsonSchema\Entity\JsonPointer;
 use PHPUnit\Framework\Constraint\Constraint;
 use Psr\Http\Message\UriInterface;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 use Rebilly\OpenAPI\UnexpectedValueException;
+use stdClass;
 
 /**
  * Constraint that asserts that the URI matches the expected
@@ -21,64 +23,31 @@ use Rebilly\OpenAPI\UnexpectedValueException;
  */
 final class UriConstraint extends Constraint
 {
-    /**
-     * @var array
-     */
     private $allowedSchemes;
 
-    /**
-     * @var string
-     */
     private $basePath;
 
-    /**
-     * @var array
-     */
     private $templateParams;
 
-    /**
-     * @var array
-     */
     private $queryParams;
 
-    /**
-     * @var string
-     */
     private $host;
 
-    /**
-     * @var array
-     */
     private $errors = [];
 
-    /**
-     * @var string
-     */
     private $template;
 
-    /**
-     * @var Validator
-     */
     private $validator;
 
-    /**
-     * @param array $expectedSchemes
-     * @param string $host
-     * @param string $basePath
-     * @param string $template
-     * @param array $pathParams
-     * @param array $queryParams
-     */
     public function __construct(
         array $expectedSchemes,
-        $host,
-        $basePath,
-        $template,
+        string $host,
+        string $basePath,
+        string $template,
         array $pathParams,
         array $queryParams
     ) {
         parent::__construct();
-
         $this->allowedSchemes = array_map('strtolower', $expectedSchemes);
         $this->host = $host;
         $this->basePath = $basePath;
@@ -88,9 +57,6 @@ final class UriConstraint extends Constraint
         $this->validator = new Validator('undefined');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function matches($uri): bool
     {
         if (!$uri instanceof UriInterface) {
@@ -147,7 +113,7 @@ final class UriConstraint extends Constraint
 
                         $this->errors = array_merge(
                             $this->errors,
-                            $this->validator->validate($actualSegment, $pathParamSchema, 'path')
+                            $this->validator->validate($actualSegment, $pathParamSchema, new JsonPointer('#/path'))
                         );
                     }
                 }
@@ -166,7 +132,7 @@ final class UriConstraint extends Constraint
 
                 $this->errors = array_merge(
                     $this->errors,
-                    $this->validator->validate($actualQueryParam, $queryParamSchema, 'query')
+                    $this->validator->validate($actualQueryParam, $queryParamSchema, new JsonPointer('#/query'))
                 );
             } elseif (isset($queryParamSchema->required) && $queryParamSchema->required) {
                 $this->errors[] = [
@@ -179,36 +145,22 @@ final class UriConstraint extends Constraint
         return empty($this->errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function failureDescription($other): string
     {
         return json_encode((object) $this->normalizeUri($other)) . ' ' . $this->toString();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'matches an specified URI parts';
     }
 
-    /**
-     * @param UriInterface $uri
-     *
-     * @return array
-     */
-    private static function normalizeUri(UriInterface $uri)
+    private static function normalizeUri(UriInterface $uri): array
     {
         return [
             'schema' => $uri->getScheme(),
@@ -217,14 +169,7 @@ final class UriConstraint extends Constraint
         ];
     }
 
-    /**
-     * Ensure schema is object.
-     *
-     * @param object|array $schema
-     *
-     * @return object
-     */
-    private static function normalizeJsonSchema($schema)
+    private static function normalizeJsonSchema($schema): stdClass
     {
         return (object) $schema;
     }
@@ -245,15 +190,7 @@ final class UriConstraint extends Constraint
         return $value;
     }
 
-    /**
-     * Split string to segments by regexp.
-     *
-     * @param string $pattern
-     * @param string $subject
-     *
-     * @return array
-     */
-    private static function splitString($pattern, $subject)
+    private static function splitString(string $pattern, string $subject): array
     {
         return preg_split($pattern, $subject, -1, PREG_SPLIT_NO_EMPTY);
     }

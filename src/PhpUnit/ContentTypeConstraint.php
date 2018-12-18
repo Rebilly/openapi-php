@@ -19,43 +19,25 @@ use PHPUnit\Framework\Constraint\Constraint;
  */
 final class ContentTypeConstraint extends Constraint
 {
-    /**
-     * @var array
-     */
     private $allowedTypes;
 
-    /**
-     * @param array $allowedTypes
-     */
     public function __construct(array $allowedTypes)
     {
         parent::__construct();
-
         $this->allowedTypes = array_map([$this, 'stripParams'], $allowedTypes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function matches($other): bool
     {
         return in_array($this->stripParams($other), $this->allowedTypes, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'is an allowed content-type (' . implode(', ', $this->allowedTypes) . ')';
     }
 
-    /**
-     * @param string $type
-     *
-     * @return string
-     */
-    private static function stripParams($type)
+    private static function stripParams(string $type): string
     {
         return strstr($type, ';', true) ?: $type;
     }

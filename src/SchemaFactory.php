@@ -10,41 +10,21 @@
 
 namespace Rebilly\OpenAPI;
 
-use JsonSchema\RefResolver;
+use JsonSchema\SchemaStorage;
 use JsonSchema\Uri\UriResolver;
 use JsonSchema\Uri\UriRetriever;
 
-/**
- * Schema representation factory.
- */
 final class SchemaFactory
 {
-    /**
-     * @var RefResolver
-     */
-    private $resolver;
-
-    /**
-     * Constructor.
-     */
-    public function __construct()
+    public function create(string $uri)
     {
-        $this->resolver = new RefResolver(new UriRetriever(), new UriResolver());
-    }
+        if (strpos($uri, '//') === false) {
+            $uri = "file://{$uri}";
+        }
 
-    /**
-     * @param string $uri
-     *
-     * @return Schema
-     */
-    public function create($uri)
-    {
-        return new Schema(
-            $this->resolver->resolve(
-                strpos($uri, '//') === false
-                    ? "file://{$uri}"
-                    : $uri
-            )
-        );
+        $schemaStorage = new SchemaStorage(new UriRetriever(), new UriResolver());
+        $schemaStorage->addSchema($uri);
+
+        return new Schema($schemaStorage->getSchema($uri));
     }
 }

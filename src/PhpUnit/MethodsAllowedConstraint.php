@@ -17,24 +17,14 @@ use PHPUnit\Framework\Constraint\Constraint;
  */
 final class MethodsAllowedConstraint extends Constraint
 {
-    /**
-     * @var array
-     */
     private $allowedMethods;
 
-    /**
-     * @param array $allowedMethods
-     */
     public function __construct(array $allowedMethods)
     {
         parent::__construct();
-
         $this->allowedMethods = array_map('strtoupper', $allowedMethods);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function matches($other): bool
     {
         if (is_string($other)) {
@@ -44,9 +34,6 @@ final class MethodsAllowedConstraint extends Constraint
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return 'matches an allowed methods (' . implode(', ', $this->allowedMethods) . ')';
