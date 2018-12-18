@@ -18,7 +18,7 @@ abstract class TestCase extends Framework\TestCase
 {
     protected function getSchemaSource(): string
     {
-        return __DIR__ . '/Doubles/schema.json';
+        return __DIR__ . '/Doubles/openapi3.json';
     }
 
     protected function getSchemaFactory(): SchemaFactory
