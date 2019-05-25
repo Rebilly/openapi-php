@@ -78,7 +78,7 @@ class HeadersConstraintTest extends TestCase
         try {
             self::assertThat($headers, $this->constraint);
         } catch (Exception $e) {
-            self::assertContains(
+            self::assertStringContainsString(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid URI: {$error}"

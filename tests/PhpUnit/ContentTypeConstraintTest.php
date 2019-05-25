@@ -47,7 +47,7 @@ class ContentTypeConstraintTest extends TestCase
         try {
             self::assertThat('text/json', $this->constraint);
         } catch (ExpectationFailedException $e) {
-            self::assertContains($this->constraint->toString(), $e->getMessage());
+            self::assertStringContainsString($this->constraint->toString(), $e->getMessage());
         }
 
         if (!isset($e)) {
