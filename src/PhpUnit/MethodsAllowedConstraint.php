@@ -26,6 +26,11 @@ final class MethodsAllowedConstraint extends Constraint
         $this->allowedMethods = array_map('strtoupper', $allowedMethods);
     }
 
+    public function toString(): string
+    {
+        return 'matches an allowed methods (' . implode(', ', $this->allowedMethods) . ')';
+    }
+
     protected function matches($other): bool
     {
         if (is_string($other)) {
@@ -33,10 +38,5 @@ final class MethodsAllowedConstraint extends Constraint
         }
 
         return empty(array_diff($this->allowedMethods, array_map('strtoupper', $other)));
-    }
-
-    public function toString(): string
-    {
-        return 'matches an allowed methods (' . implode(', ', $this->allowedMethods) . ')';
     }
 }

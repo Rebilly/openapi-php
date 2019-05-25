@@ -35,6 +35,11 @@ final class HeadersConstraint extends Constraint
         $this->validator = new Validator('undefined');
     }
 
+    public function toString(): string
+    {
+        return 'matches an specified headers schemas';
+    }
+
     protected function matches($actualHeaders): bool
     {
         if (!is_array($actualHeaders)) {
@@ -68,11 +73,6 @@ final class HeadersConstraint extends Constraint
     protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
-    }
-
-    public function toString(): string
-    {
-        return 'matches an specified headers schemas';
     }
 
     private static function normalizeJsonSchema($schema): stdClass

@@ -28,14 +28,14 @@ final class ContentTypeConstraint extends Constraint
         $this->allowedTypes = array_map([$this, 'stripParams'], $allowedTypes);
     }
 
-    protected function matches($other): bool
-    {
-        return in_array($this->stripParams($other), $this->allowedTypes, true);
-    }
-
     public function toString(): string
     {
         return 'is an allowed content-type (' . implode(', ', $this->allowedTypes) . ')';
+    }
+
+    protected function matches($other): bool
+    {
+        return in_array($this->stripParams($other), $this->allowedTypes, true);
     }
 
     private static function stripParams(string $type): string

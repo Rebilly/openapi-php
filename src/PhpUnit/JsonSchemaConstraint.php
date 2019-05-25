@@ -36,6 +36,11 @@ final class JsonSchemaConstraint extends Constraint
         $this->validator = new Validator($this->context);
     }
 
+    public function toString(): string
+    {
+        return "matches defined {$this->context}";
+    }
+
     protected function matches($other): bool
     {
         $this->errors = $this->validator->validate($other, $this->schema);
@@ -51,10 +56,5 @@ final class JsonSchemaConstraint extends Constraint
     protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
-    }
-
-    public function toString(): string
-    {
-        return "matches defined {$this->context}";
     }
 }

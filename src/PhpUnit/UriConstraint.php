@@ -50,27 +50,9 @@ final class UriConstraint extends Constraint
         $this->validator = new Validator('undefined');
     }
 
-    private function assertPathSegment(string $expectedSegment, string $actualSegment): void
+    public function toString(): string
     {
-        if ($actualSegment !== $expectedSegment) {
-            $this->errors[] = [
-                'property' => 'path',
-                'message' => "Missing path segment ({$expectedSegment})",
-            ];
-        }
-    }
-
-    private function assertPathParam(string $expectedSegment, string $actualSegment): void
-    {
-        $pathParamSchema = $this->pathParameters[substr($expectedSegment, 1, -1)];
-
-        // TODO: Consider to disallow non-string params in path, that make no sense
-        $actualSegment = $this->normalizeNumericString($actualSegment);
-
-        $this->errors = array_merge(
-            $this->errors,
-            $this->validator->validate($actualSegment, $pathParamSchema, new JsonPointer('#/path'))
-        );
+        return 'matches an specified URI parts';
     }
 
     protected function matches($uri): bool
@@ -158,9 +140,27 @@ final class UriConstraint extends Constraint
         return $this->validator->serializeErrors($this->errors);
     }
 
-    public function toString(): string
+    private function assertPathSegment(string $expectedSegment, string $actualSegment): void
     {
-        return 'matches an specified URI parts';
+        if ($actualSegment !== $expectedSegment) {
+            $this->errors[] = [
+                'property' => 'path',
+                'message' => "Missing path segment ({$expectedSegment})",
+            ];
+        }
+    }
+
+    private function assertPathParam(string $expectedSegment, string $actualSegment): void
+    {
+        $pathParamSchema = $this->pathParameters[substr($expectedSegment, 1, -1)];
+
+        // TODO: Consider to disallow non-string params in path, that make no sense
+        $actualSegment = $this->normalizeNumericString($actualSegment);
+
+        $this->errors = array_merge(
+            $this->errors,
+            $this->validator->validate($actualSegment, $pathParamSchema, new JsonPointer('#/path'))
+        );
     }
 
     private static function normalizeUri(UriInterface $uri): array
