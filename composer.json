@@ -15,6 +15,7 @@
   "require": {
     "php": "^7.1",
     "ext-json": "*",
+    "ext-mbstring": "*",
     "psr/http-message": "^1.0",
     "justinrainbow/json-schema": "~5.2",
     "phpunit/phpunit": "~7.5"
