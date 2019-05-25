@@ -51,7 +51,7 @@ final class AssertsTest extends TestCase
         try {
             self::assertRequest($this->schema, $path, $request);
         } catch (Exception $e) {
-            self::assertContains(
+            self::assertStringContainsString(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid URI: {$error}"

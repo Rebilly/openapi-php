@@ -44,7 +44,7 @@ class MethodsAllowedConstraintTest extends TestCase
         try {
             self::assertThat('POST', $this->constraint);
         } catch (ExpectationFailedException $e) {
-            self::assertContains($this->constraint->toString(), $e->getMessage());
+            self::assertStringContainsString($this->constraint->toString(), $e->getMessage());
         }
 
         if (!isset($e)) {

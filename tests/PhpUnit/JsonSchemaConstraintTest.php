@@ -66,7 +66,7 @@ final class JsonSchemaConstraintTest extends TestCase
         try {
             self::assertThat($json, $this->constraint);
         } catch (ExpectationFailedException $e) {
-            self::assertContains(
+            self::assertStringContainsString(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid JSON: {$error}"
