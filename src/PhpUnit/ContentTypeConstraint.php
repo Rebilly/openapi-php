@@ -40,6 +40,6 @@ final class ContentTypeConstraint extends Constraint
 
     private static function stripParams(string $type): string
     {
-        return strstr($type, ';', true) ?: $type;
+        return mb_strstr($type, ';', true) ?: $type;
     }
 }

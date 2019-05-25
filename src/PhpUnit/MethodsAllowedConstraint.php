@@ -23,7 +23,7 @@ final class MethodsAllowedConstraint extends Constraint
     public function __construct(array $allowedMethods)
     {
         parent::__construct();
-        $this->allowedMethods = array_map('strtoupper', $allowedMethods);
+        $this->allowedMethods = array_map('mb_strtoupper', $allowedMethods);
     }
 
     public function toString(): string
@@ -34,9 +34,9 @@ final class MethodsAllowedConstraint extends Constraint
     protected function matches($other): bool
     {
         if (is_string($other)) {
-            return in_array(strtoupper($other), $this->allowedMethods, true);
+            return in_array(mb_strtoupper($other), $this->allowedMethods, true);
         }
 
-        return empty(array_diff($this->allowedMethods, array_map('strtoupper', $other)));
+        return empty(array_diff($this->allowedMethods, array_map('mb_strtoupper', $other)));
     }
 }

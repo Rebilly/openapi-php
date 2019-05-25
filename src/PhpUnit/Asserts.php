@@ -117,7 +117,7 @@ trait Asserts
     final protected static function assertResponseDefined(Schema $schema, string $template, string $method, string $status, string $msg = ''): void
     {
         Assert::assertTrue(
-            $schema->isResponseDefined($template, strtolower($method), $status),
+            $schema->isResponseDefined($template, mb_strtolower($method), $status),
             $msg ?: "Operation \"{$method} {$template}\" does not support response code \"{$status}\""
         );
     }
@@ -150,7 +150,7 @@ trait Asserts
     {
         Assert::assertThat(
             $headers,
-            new HeadersConstraint($schema->getRequestHeaderSchemas($path, strtolower($method))),
+            new HeadersConstraint($schema->getRequestHeaderSchemas($path, mb_strtolower($method))),
             $msg
         );
 
@@ -158,7 +158,7 @@ trait Asserts
             self::assertRequestContentType(
                 $schema,
                 $path,
-                strtolower($method),
+                mb_strtolower($method),
                 $headers['Content-Type'][0],
                 $msg
             );
@@ -170,7 +170,7 @@ trait Asserts
         Assert::assertThat(
             $headers,
             new HeadersConstraint(
-                $schema->getResponseHeaderSchemas($path, strtolower($method), $status)
+                $schema->getResponseHeaderSchemas($path, mb_strtolower($method), $status)
             ),
             $msg
         );
@@ -187,7 +187,7 @@ trait Asserts
         }
 
         if (isset($headers['Allow'])) {
-            if (isset($headers['Allow'][0]) && strpos($headers['Allow'][0], ',') !== false) {
+            if (isset($headers['Allow'][0]) && mb_strpos($headers['Allow'][0], ',') !== false) {
                 $headers['Allow'] = preg_split('#\s*,\s*#', $headers['Allow'][0], -1, PREG_SPLIT_NO_EMPTY);
             }
 
@@ -201,7 +201,7 @@ trait Asserts
 
     final protected static function assertRequestBody(Schema $schema, string $path, string $method, StreamInterface $body = null, string $msg = ''): void
     {
-        $bodySchema = $schema->getRequestBodySchema($path, strtolower($method));
+        $bodySchema = $schema->getRequestBodySchema($path, mb_strtolower($method));
 
         if ($bodySchema) {
             Assert::assertThat(
@@ -216,7 +216,7 @@ trait Asserts
 
     final protected static function assertResponseBody(Schema $schema, string $path, string $method, string $status, StreamInterface $body = null, string $msg = ''): void
     {
-        $bodySchema = $schema->getResponseBodySchema($path, strtolower($method), $status);
+        $bodySchema = $schema->getResponseBodySchema($path, mb_strtolower($method), $status);
 
         if ($bodySchema) {
             Assert::assertThat(
