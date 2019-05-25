@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.0] 2019-05-25
+
+### Changed
+
+- Use multi-byte functions (#34) 
+- Use more strict code (comparisons, assertions, type-hints) (#35) 
+
 ## [0.6.0] 2018-12-18
 
 ### Changed
