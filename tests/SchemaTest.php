@@ -44,7 +44,7 @@ final class SchemaTest extends TestCase
      */
     public function howToUseSwagger(Schema $schema): void
     {
-        $this->assertEquals(['https://api.example.com/v1'], $schema->getServers());
+        $this->assertSame(['https://api.example.com/v1'], $schema->getServers());
 
         $definitions = $schema->getDefinitionNames();
         $this->assertGreaterThan(0, count($definitions));
