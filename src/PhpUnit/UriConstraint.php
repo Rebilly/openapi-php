@@ -49,7 +49,7 @@ final class UriConstraint extends Constraint
         $this->validator = new Validator('undefined');
     }
 
-    private function assertPathSegment(string $expectedSegment, string $actualSegment)
+    private function assertPathSegment(string $expectedSegment, string $actualSegment): void
     {
         if ($actualSegment !== $expectedSegment) {
             $this->errors[] = [
@@ -59,7 +59,7 @@ final class UriConstraint extends Constraint
         }
     }
 
-    private function assertPathParam(string $expectedSegment, string $actualSegment)
+    private function assertPathParam(string $expectedSegment, string $actualSegment): void
     {
         $pathParamSchema = $this->pathParameters[mb_substr($expectedSegment, 1, -1)];
 
