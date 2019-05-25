@@ -51,7 +51,7 @@ final class JsonSchemaConstraintTest extends TestCase
             ]
         );
 
-        $this->assertThat($json, $this->constraint);
+        self::assertThat($json, $this->constraint);
     }
 
     /**
@@ -64,9 +64,9 @@ final class JsonSchemaConstraintTest extends TestCase
         $error = $this->getDataSetName();
 
         try {
-            $this->assertThat($json, $this->constraint);
+            self::assertThat($json, $this->constraint);
         } catch (ExpectationFailedException $e) {
-            $this->assertContains(
+            self::assertContains(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid JSON: {$error}"
@@ -74,7 +74,7 @@ final class JsonSchemaConstraintTest extends TestCase
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting that passed invalid JSON');
+            self::fail('Failed asserting that passed invalid JSON');
         }
     }
 

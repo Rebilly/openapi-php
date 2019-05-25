@@ -37,7 +37,7 @@ final class AssertsTest extends TestCase
      */
     public function validateValidRequest(string $path, Request $request): void
     {
-        $this->assertRequest($this->schema, $path, $request);
+        self::assertRequest($this->schema, $path, $request);
     }
 
     /**
@@ -49,9 +49,9 @@ final class AssertsTest extends TestCase
         $error = $this->getDataSetName();
 
         try {
-            $this->assertRequest($this->schema, $path, $request);
+            self::assertRequest($this->schema, $path, $request);
         } catch (Exception $e) {
-            $this->assertContains(
+            self::assertContains(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid URI: {$error}"
@@ -59,7 +59,7 @@ final class AssertsTest extends TestCase
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting that passed invalid URI');
+            self::fail('Failed asserting that passed invalid URI');
         }
     }
 
@@ -69,7 +69,7 @@ final class AssertsTest extends TestCase
      */
     public function validateValidResponse(string $path, string $method, Response $response): void
     {
-        $this->assertResponse($this->schema, $path, $method, $response);
+        self::assertResponse($this->schema, $path, $method, $response);
     }
 
     /**
@@ -78,7 +78,7 @@ final class AssertsTest extends TestCase
      */
     public function validateValidDefinition(string $class, stdClass $object): void
     {
-        $this->assertDefinitionSchema($this->schema, $class, $object);
+        self::assertDefinitionSchema($this->schema, $class, $object);
     }
 
     public function provideValidRequests(): array

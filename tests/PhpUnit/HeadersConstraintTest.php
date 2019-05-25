@@ -50,7 +50,7 @@ class HeadersConstraintTest extends TestCase
     public function passUnexpectedValue(): void
     {
         $this->expectExceptionObject(new UnexpectedValueException('Array expected'));
-        $this->assertThat((object) [], $this->constraint);
+        self::assertThat((object) [], $this->constraint);
     }
 
     /**
@@ -64,7 +64,7 @@ class HeadersConstraintTest extends TestCase
             'X-Timestamp' => [time()],
         ];
 
-        $this->assertThat($headers, $this->constraint);
+        self::assertThat($headers, $this->constraint);
     }
 
     /**
@@ -76,9 +76,9 @@ class HeadersConstraintTest extends TestCase
         $error = $this->getDataSetName();
 
         try {
-            $this->assertThat($headers, $this->constraint);
+            self::assertThat($headers, $this->constraint);
         } catch (Exception $e) {
-            $this->assertContains(
+            self::assertContains(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid URI: {$error}"
@@ -86,7 +86,7 @@ class HeadersConstraintTest extends TestCase
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting that passed invalid URI');
+            self::fail('Failed asserting that passed invalid URI');
         }
     }
 

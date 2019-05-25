@@ -36,7 +36,7 @@ class ContentTypeConstraintTest extends TestCase
      */
     public function assertValidType(string $type): void
     {
-        $this->assertThat($type, $this->constraint);
+        self::assertThat($type, $this->constraint);
     }
 
     /**
@@ -45,13 +45,13 @@ class ContentTypeConstraintTest extends TestCase
     public function assertInvalidType(): void
     {
         try {
-            $this->assertThat('text/json', $this->constraint);
+            self::assertThat('text/json', $this->constraint);
         } catch (ExpectationFailedException $e) {
-            $this->assertContains($this->constraint->toString(), $e->getMessage());
+            self::assertContains($this->constraint->toString(), $e->getMessage());
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting the constraint');
+            self::fail('Failed asserting the constraint');
         }
     }
 
