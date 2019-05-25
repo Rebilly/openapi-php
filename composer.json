@@ -26,7 +26,7 @@
   },
   "require-dev": {
     "guzzlehttp/guzzle": "~6.2",
-    "scrutinizer/ocular": "~1.1",
+    "scrutinizer/ocular": "^1.5.2",
     "friendsofphp/php-cs-fixer": "^2.15"
   },
   "autoload-dev": {
