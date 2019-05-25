@@ -25,7 +25,7 @@ final class Schema
 
     public function __construct(string $uri)
     {
-        if (strpos($uri, '//') === false) {
+        if (mb_strpos($uri, '//') === false) {
             $uri = "file://{$uri}";
         }
 
@@ -206,7 +206,7 @@ final class Schema
 
     private function normalizeMethod(string $method): string
     {
-        return strtolower($method);
+        return mb_strtolower($method);
     }
 
     private function getRequestParameters(string $path, string $method, string $location): array

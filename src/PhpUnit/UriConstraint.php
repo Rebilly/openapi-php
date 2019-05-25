@@ -61,7 +61,7 @@ final class UriConstraint extends Constraint
 
     private function assertPathParam(string $expectedSegment, string $actualSegment)
     {
-        $pathParamSchema = $this->pathParameters[substr($expectedSegment, 1, -1)];
+        $pathParamSchema = $this->pathParameters[mb_substr($expectedSegment, 1, -1)];
 
         // TODO: Consider to disallow non-string params in path, that make no sense
         $actualSegment = $this->normalizeNumericString($actualSegment);
@@ -81,7 +81,7 @@ final class UriConstraint extends Constraint
         $baseUrl = null;
 
         foreach ($this->servers as $serverUrl) {
-            if (strpos((string) $uri, $serverUrl) === 0) {
+            if (mb_strpos((string) $uri, $serverUrl) === 0) {
                 $baseUrl = $serverUrl;
 
                 continue;
@@ -97,8 +97,8 @@ final class UriConstraint extends Constraint
             return false;
         }
 
-        $pathStart = strlen($baseUrl) - strpos($baseUrl, '/', strpos($baseUrl, '://') + 3);
-        $path = substr($uri->getPath(), $pathStart + 1);
+        $pathStart = mb_strlen($baseUrl) - mb_strpos($baseUrl, '/', mb_strpos($baseUrl, '://') + 3);
+        $path = mb_substr($uri->getPath(), $pathStart + 1);
         $actualSegments = $this->splitString('#\/#', $path);
         $expectedSegments = $this->splitString('#\/#', $this->path);
 
@@ -113,7 +113,7 @@ final class UriConstraint extends Constraint
 
         foreach ($expectedSegments as $i => $expectedSegment) {
             $actualSegment = $actualSegments[$i];
-            strpos($expectedSegment, '{') === false
+            mb_strpos($expectedSegment, '{') === false
                 ? $this->assertPathSegment($expectedSegment, $actualSegment)
                 : $this->assertPathParam($expectedSegment, $actualSegment);
         }
