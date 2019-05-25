@@ -84,12 +84,9 @@ final class HeadersConstraint extends Constraint
      * but OpenAPI allow scalar values. So if scalar value expected,
      * we try to cast array to scalar, using first element.
      *
-     * @param array $value
-     * @param string $type
-     *
-     * @return array
+     * @return mixed
      */
-    private static function normalizeHeaderValue(array $value, $type)
+    private static function normalizeHeaderValue(array $value, string $type)
     {
         if ($type !== 'array') {
             $value = empty($value) ? null : reset($value);
