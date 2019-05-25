@@ -28,6 +28,8 @@ class MethodsAllowedConstraintTest extends TestCase
     /**
      * @test
      * @dataProvider providerValidMethods
+     *
+     * @param mixed $method
      */
     public function assertValidMethod($method): void
     {
