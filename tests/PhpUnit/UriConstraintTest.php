@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -48,7 +49,7 @@ class UriConstraintTest extends TestCase
     public function assertValidUri(): void
     {
         $uri = new Uri('https://api.example.com/v1/posts/1?q=');
-        $this->assertThat($uri, $this->constraint);
+        self::assertThat($uri, $this->constraint);
     }
 
     /**
@@ -58,7 +59,7 @@ class UriConstraintTest extends TestCase
     {
         $this->expectExceptionObject(new UnexpectedValueException('The object should implements UriInterface'));
         $uri = 'https://api.example.com/v1/posts';
-        $this->assertThat($uri, $this->constraint);
+        self::assertThat($uri, $this->constraint);
     }
 
     /**
@@ -70,9 +71,9 @@ class UriConstraintTest extends TestCase
         $error = $this->getDataSetName();
 
         try {
-            $this->assertThat($uri, $this->constraint);
+            self::assertThat($uri, $this->constraint);
         } catch (Exception $e) {
-            $this->assertContains(
+            self::assertContains(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid URI: {$error}"
@@ -80,7 +81,7 @@ class UriConstraintTest extends TestCase
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting that passed invalid URI');
+            self::fail('Failed asserting that passed invalid URI');
         }
     }
 

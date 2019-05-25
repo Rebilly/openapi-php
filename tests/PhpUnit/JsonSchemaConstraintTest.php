@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -50,7 +51,7 @@ final class JsonSchemaConstraintTest extends TestCase
             ]
         );
 
-        $this->assertThat($json, $this->constraint);
+        self::assertThat($json, $this->constraint);
     }
 
     /**
@@ -63,9 +64,9 @@ final class JsonSchemaConstraintTest extends TestCase
         $error = $this->getDataSetName();
 
         try {
-            $this->assertThat($json, $this->constraint);
+            self::assertThat($json, $this->constraint);
         } catch (ExpectationFailedException $e) {
-            $this->assertContains(
+            self::assertContains(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid JSON: {$error}"
@@ -73,7 +74,7 @@ final class JsonSchemaConstraintTest extends TestCase
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting that passed invalid JSON');
+            self::fail('Failed asserting that passed invalid JSON');
         }
     }
 

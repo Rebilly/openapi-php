@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -27,14 +28,14 @@ final class ContentTypeConstraint extends Constraint
         $this->allowedTypes = array_map([$this, 'stripParams'], $allowedTypes);
     }
 
-    protected function matches($other): bool
-    {
-        return in_array($this->stripParams($other), $this->allowedTypes, true);
-    }
-
     public function toString(): string
     {
         return 'is an allowed content-type (' . implode(', ', $this->allowedTypes) . ')';
+    }
+
+    protected function matches($other): bool
+    {
+        return in_array($this->stripParams($other), $this->allowedTypes, true);
     }
 
     private static function stripParams(string $type): string

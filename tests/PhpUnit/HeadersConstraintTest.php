@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -49,7 +50,7 @@ class HeadersConstraintTest extends TestCase
     public function passUnexpectedValue(): void
     {
         $this->expectExceptionObject(new UnexpectedValueException('Array expected'));
-        $this->assertThat((object) [], $this->constraint);
+        self::assertThat((object) [], $this->constraint);
     }
 
     /**
@@ -63,7 +64,7 @@ class HeadersConstraintTest extends TestCase
             'X-Timestamp' => [time()],
         ];
 
-        $this->assertThat($headers, $this->constraint);
+        self::assertThat($headers, $this->constraint);
     }
 
     /**
@@ -75,9 +76,9 @@ class HeadersConstraintTest extends TestCase
         $error = $this->getDataSetName();
 
         try {
-            $this->assertThat($headers, $this->constraint);
+            self::assertThat($headers, $this->constraint);
         } catch (Exception $e) {
-            $this->assertContains(
+            self::assertContains(
                 $error,
                 $e->getMessage(),
                 "Failed asserting that passed invalid URI: {$error}"
@@ -85,7 +86,7 @@ class HeadersConstraintTest extends TestCase
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting that passed invalid URI');
+            self::fail('Failed asserting that passed invalid URI');
         }
     }
 

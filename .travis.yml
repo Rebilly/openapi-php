@@ -9,8 +9,7 @@ matrix:
     - php: 7.2
       env:
         - EXECUTE_COVERAGE=true
-    - php: 7.3
-  allow_failures:
+        - EXECUTE_CS_CHECK=true
     - php: 7.3
 
 notifications:

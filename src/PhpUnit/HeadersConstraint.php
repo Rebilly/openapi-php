@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -32,6 +33,11 @@ final class HeadersConstraint extends Constraint
         parent::__construct();
         $this->expectedHeadersSchemas = array_map([$this, 'normalizeJsonSchema'], $expectedHeadersSchemas);
         $this->validator = new Validator('undefined');
+    }
+
+    public function toString(): string
+    {
+        return 'matches an specified headers schemas';
     }
 
     protected function matches($actualHeaders): bool
@@ -67,11 +73,6 @@ final class HeadersConstraint extends Constraint
     protected function additionalFailureDescription($other): string
     {
         return $this->validator->serializeErrors($this->errors);
-    }
-
-    public function toString(): string
-    {
-        return 'matches an specified headers schemas';
     }
 
     private static function normalizeJsonSchema($schema): stdClass

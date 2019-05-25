@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -35,7 +36,7 @@ class ContentTypeConstraintTest extends TestCase
      */
     public function assertValidType(string $type): void
     {
-        $this->assertThat($type, $this->constraint);
+        self::assertThat($type, $this->constraint);
     }
 
     /**
@@ -44,13 +45,13 @@ class ContentTypeConstraintTest extends TestCase
     public function assertInvalidType(): void
     {
         try {
-            $this->assertThat('text/json', $this->constraint);
+            self::assertThat('text/json', $this->constraint);
         } catch (ExpectationFailedException $e) {
-            $this->assertContains($this->constraint->toString(), $e->getMessage());
+            self::assertContains($this->constraint->toString(), $e->getMessage());
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting the constraint');
+            self::fail('Failed asserting the constraint');
         }
     }
 

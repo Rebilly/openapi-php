@@ -1,11 +1,12 @@
 <?php
 /**
- * This file is part of Rebilly.
+ * This source file is proprietary and part of Rebilly.
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * (c) Rebilly SRL
+ *     Rebilly Ltd.
+ *     Rebilly Inc.
  *
- * @see http://rebilly.com
+ * @see https://www.rebilly.com
  */
 
 namespace Rebilly\OpenAPI\PhpUnit;
@@ -27,10 +28,12 @@ class MethodsAllowedConstraintTest extends TestCase
     /**
      * @test
      * @dataProvider providerValidMethods
+     *
+     * @param mixed $method
      */
     public function assertValidMethod($method): void
     {
-        $this->assertThat($method, $this->constraint);
+        self::assertThat($method, $this->constraint);
     }
 
     /**
@@ -39,13 +42,13 @@ class MethodsAllowedConstraintTest extends TestCase
     public function assertInvalidMethod(): void
     {
         try {
-            $this->assertThat('POST', $this->constraint);
+            self::assertThat('POST', $this->constraint);
         } catch (ExpectationFailedException $e) {
-            $this->assertContains($this->constraint->toString(), $e->getMessage());
+            self::assertContains($this->constraint->toString(), $e->getMessage());
         }
 
         if (!isset($e)) {
-            $this->fail('Failed asserting the constraint');
+            self::fail('Failed asserting the constraint');
         }
     }
 
