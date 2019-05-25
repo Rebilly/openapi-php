@@ -29,7 +29,7 @@ final class MethodsAllowedConstraint extends Constraint
     protected function matches($other): bool
     {
         if (is_string($other)) {
-            return in_array(strtoupper($other), $this->allowedMethods);
+            return in_array(strtoupper($other), $this->allowedMethods, true);
         }
 
         return empty(array_diff($this->allowedMethods, array_map('strtoupper', $other)));
