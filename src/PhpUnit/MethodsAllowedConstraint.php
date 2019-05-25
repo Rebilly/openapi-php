@@ -30,9 +30,9 @@ final class MethodsAllowedConstraint extends Constraint
     {
         if (is_string($other)) {
             return in_array(strtoupper($other), $this->allowedMethods);
-        } else {
-            return empty(array_diff($this->allowedMethods, array_map('strtoupper', $other)));
         }
+
+        return empty(array_diff($this->allowedMethods, array_map('strtoupper', $other)));
     }
 
     public function toString(): string
