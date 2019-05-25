@@ -194,7 +194,7 @@ final class Schema
     private function fetch(string $path)
     {
         try {
-            return $this->schemaStorage->resolveRef(sprintf("%s%s", $this->uri, $path));
+            return $this->schemaStorage->resolveRef(sprintf('%s%s', $this->uri, $path));
         } catch (UnresolvableJsonPointerException $e) {
             return null;
         }
