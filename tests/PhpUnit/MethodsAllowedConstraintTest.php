@@ -18,7 +18,7 @@ class MethodsAllowedConstraintTest extends TestCase
     /** @var MethodsAllowedConstraint */
     private $constraint;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->constraint = new MethodsAllowedConstraint(['OPTIONS', 'HEAD', 'GET']);
