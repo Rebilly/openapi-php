@@ -22,7 +22,6 @@ final class MethodsAllowedConstraint extends Constraint
 
     public function __construct(array $allowedMethods)
     {
-        parent::__construct();
         $this->allowedMethods = array_map('mb_strtoupper', $allowedMethods);
     }
 

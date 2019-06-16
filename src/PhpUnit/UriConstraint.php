@@ -42,7 +42,6 @@ final class UriConstraint extends Constraint
         array $pathParameters,
         array $queryParameters
     ) {
-        parent::__construct();
         $this->servers = array_map('strtolower', $servers);
         $this->path = $path;
         $this->pathParameters = array_map([$this, 'normalizeJsonSchema'], $pathParameters);
