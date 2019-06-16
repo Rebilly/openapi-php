@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.0] 2019-06-16
+
+### Changed
+
+- Updated minimum requirements for `php` to version `7.2`
+- Updated `phpunit/phunit` to version `8.2`
+
 ## [0.7.0] 2019-05-25
 
 ### Changed
