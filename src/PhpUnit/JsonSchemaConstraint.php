@@ -30,7 +30,6 @@ final class JsonSchemaConstraint extends Constraint
 
     public function __construct(stdClass $schema, string $context = null)
     {
-        parent::__construct();
         $this->schema = $schema;
         $this->context = $context ?: 'schema';
         $this->validator = new Validator($this->context);

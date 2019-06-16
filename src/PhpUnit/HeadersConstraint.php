@@ -30,7 +30,6 @@ final class HeadersConstraint extends Constraint
 
     public function __construct(array $expectedHeadersSchemas)
     {
-        parent::__construct();
         $this->expectedHeadersSchemas = array_map([$this, 'normalizeJsonSchema'], $expectedHeadersSchemas);
         $this->validator = new Validator('undefined');
     }

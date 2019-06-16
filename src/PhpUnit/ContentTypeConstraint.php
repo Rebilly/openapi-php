@@ -24,7 +24,6 @@ final class ContentTypeConstraint extends Constraint
 
     public function __construct(array $allowedTypes)
     {
-        parent::__construct();
         $this->allowedTypes = array_map([$this, 'stripParams'], $allowedTypes);
     }
 
