@@ -3,11 +3,17 @@ All notable changes to this project will be documented in this file
 using the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.9.0] 2021-08-12
+## [0.10.0] 2021-08-12
 
 ### Changed
 
 - Updated minimum requirements for `php` to version `7.3`
+
+## [0.9.0] 2020-02-12
+
+### Changed
+
+- Added support of `phpunit/phunit` v9
 
 ## [0.8.0] 2019-06-16
 
