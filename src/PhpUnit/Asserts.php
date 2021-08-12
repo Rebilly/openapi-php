@@ -61,12 +61,12 @@ trait Asserts
      */
     final protected static function assertResponse(Schema $schema, string $path, string $method, ResponseInterface $response, string $msg = ''): void
     {
-        self::assertResponseDefined($schema, $path, $method, $response->getStatusCode(), $msg);
+        self::assertResponseDefined($schema, $path, $method, (string) $response->getStatusCode(), $msg);
         self::assertResponseHeaders(
             $schema,
             $path,
             $method,
-            $response->getStatusCode(),
+            (string) $response->getStatusCode(),
             $response->getHeaders(),
             $msg
         );
@@ -74,7 +74,7 @@ trait Asserts
             $schema,
             $path,
             $method,
-            $response->getStatusCode(),
+            (string) $response->getStatusCode(),
             $response->getBody(),
             $msg
         );
@@ -211,12 +211,12 @@ trait Asserts
 
         if ($bodySchema) {
             Assert::assertThat(
-                json_decode($body),
+                json_decode((string) $body),
                 new JsonSchemaConstraint($bodySchema, 'request body'),
                 $msg
             );
         } else {
-            Assert::assertEmpty(json_decode($body), $msg);
+            Assert::assertEmpty(json_decode((string) $body), $msg);
         }
     }
 
@@ -226,12 +226,12 @@ trait Asserts
 
         if ($bodySchema) {
             Assert::assertThat(
-                json_decode($body),
+                json_decode((string) $body),
                 new JsonSchemaConstraint($bodySchema, 'response body'),
                 $msg
             );
         } else {
-            Assert::assertEmpty(json_decode($body), $msg);
+            Assert::assertEmpty(json_decode((string) $body), $msg);
         }
     }
 

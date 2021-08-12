@@ -100,7 +100,7 @@ final class SchemaTest extends TestCase
         self::assertTrue($schema->isResponseDefined($path, 'get', '200'));
         self::assertFalse($schema->isResponseDefined($path, 'get', '201'));
 
-        $responseHeaders = $schema->getResponseHeaderSchemas($path, 'get', 200);
+        $responseHeaders = $schema->getResponseHeaderSchemas($path, 'get', '200');
         self::assertArrayHasKey('Content-Type', $responseHeaders);
 
         $responseBody = $schema->getResponseBodySchema($path, 'get', '200');
