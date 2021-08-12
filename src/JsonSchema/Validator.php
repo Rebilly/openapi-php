@@ -9,6 +9,8 @@
  * @see https://www.rebilly.com
  */
 
+declare(strict_types=1);
+
 namespace Rebilly\OpenAPI\JsonSchema;
 
 use JsonSchema\Constraints\Constraint;
@@ -16,6 +18,8 @@ use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\SchemaConstraint;
 use JsonSchema\Entity\JsonPointer;
 use stdClass;
+use function array_map;
+use function implode;
 
 /**
  * JSON Schema validator facade.

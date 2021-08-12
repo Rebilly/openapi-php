@@ -13,7 +13,7 @@
   ],
   "minimum-stability": "stable",
   "require": {
-    "php": "^7.2",
+    "php": "^7.3|^8.0",
     "ext-json": "*",
     "ext-mbstring": "*",
     "psr/http-message": "^1.0",
@@ -28,7 +28,7 @@
   "require-dev": {
     "guzzlehttp/guzzle": "^6.3.3",
     "scrutinizer/ocular": "^1.5.2",
-    "friendsofphp/php-cs-fixer": "^2.15"
+    "friendsofphp/php-cs-fixer": "^3.0"
   },
   "autoload-dev": {
     "psr-4": {
@@ -42,5 +42,12 @@
     "branch-alias": {
       "dev-master": "1.0.x-dev"
     }
+  },
+  "scripts": {
+    "test-cs": "php-cs-fixer fix --verbose --dry-run --ansi",
+    "fix-cs": "php-cs-fixer fix --verbose --ansi",
+    "test-unit": "phpunit",
+    "upload-coverage": "ocular code-coverage:upload",
+    "test": ["@test-unit", "@test-cs"]
   }
 }

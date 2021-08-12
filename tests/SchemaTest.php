@@ -9,9 +9,12 @@
  * @see https://www.rebilly.com
  */
 
+declare(strict_types=1);
+
 namespace Rebilly\OpenAPI;
 
 use InvalidArgumentException;
+use function count;
 
 final class SchemaTest extends TestCase
 {
@@ -97,7 +100,7 @@ final class SchemaTest extends TestCase
         self::assertTrue($schema->isResponseDefined($path, 'get', '200'));
         self::assertFalse($schema->isResponseDefined($path, 'get', '201'));
 
-        $responseHeaders = $schema->getResponseHeaderSchemas($path, 'get', 200);
+        $responseHeaders = $schema->getResponseHeaderSchemas($path, 'get', '200');
         self::assertArrayHasKey('Content-Type', $responseHeaders);
 
         $responseBody = $schema->getResponseBodySchema($path, 'get', '200');

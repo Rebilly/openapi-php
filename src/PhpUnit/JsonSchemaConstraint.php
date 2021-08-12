@@ -9,11 +9,14 @@
  * @see https://www.rebilly.com
  */
 
+declare(strict_types=1);
+
 namespace Rebilly\OpenAPI\PhpUnit;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 use stdClass;
+use function json_encode;
 
 /**
  * Constraint that asserts that the object matches the expected JSON Schema.

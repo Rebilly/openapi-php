@@ -9,6 +9,8 @@
  * @see https://www.rebilly.com
  */
 
+declare(strict_types=1);
+
 namespace Rebilly\OpenAPI\PhpUnit;
 
 use Exception;
@@ -17,6 +19,7 @@ use GuzzleHttp\Psr7\Response;
 use Rebilly\OpenAPI\Schema;
 use Rebilly\OpenAPI\TestCase;
 use stdClass;
+use function json_encode;
 
 final class AssertsTest extends TestCase
 {

@@ -9,9 +9,15 @@
  * @see https://www.rebilly.com
  */
 
+declare(strict_types=1);
+
 namespace Rebilly\OpenAPI\PhpUnit;
 
 use PHPUnit\Framework\Constraint\Constraint;
+use function array_map;
+use function implode;
+use function in_array;
+use function mb_strstr;
 
 /**
  * Constraint that asserts that the content-type matches the expected types.

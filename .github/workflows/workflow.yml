@@ -1,0 +1,90 @@
+name: Tests
+on: [pull_request]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ['7.3', '7.4', '8.0']
+
+    env:
+      EXECUTE_COVERAGE: ${{ matrix.php-version == '7.3' }}
+      CLOVER_PATH: "clover.xml"
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, curl, json
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Install dependencies
+        run: composer install -n --no-suggest
+
+      - name: Run PhpUnit with coverage
+        if: env.EXECUTE_COVERAGE == 'true'
+        run: composer test-unit -- --testdox --colors=always --coverage-clover ${{ env.CLOVER_PATH }}
+
+      - name: Run PhpUnit
+        if: env.EXECUTE_COVERAGE != 'true'
+        run: composer test-unit -- --testdox --colors=always
+
+      - name: Coverage monitor
+        if: env.EXECUTE_COVERAGE == 'true'
+        uses: slavcodev/coverage-monitor-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          clover_file: ${{ env.CLOVER_PATH }}
+          threshold_alert: 0
+          threshold_warning: 50
+
+      - name: Upload coverage
+        if: env.EXECUTE_COVERAGE == 'true'
+        run: composer upload-coverage -- --format=php-clover ${{ env.CLOVER_PATH }} --repository=g/$GITHUB_REPOSITORY --parent=$GITHUB_BASE_REF
+
+  lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 1
+      matrix:
+        php-version: ['7.3']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl, curl, json
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Install dependencies
+        run: composer install -n --no-suggest
+
+      - name: Lint code
+        run: composer test-cs -- -vv

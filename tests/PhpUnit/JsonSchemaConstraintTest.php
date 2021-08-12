@@ -9,10 +9,13 @@
  * @see https://www.rebilly.com
  */
 
+declare(strict_types=1);
+
 namespace Rebilly\OpenAPI\PhpUnit;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
+use function date;
 
 final class JsonSchemaConstraintTest extends TestCase
 {
