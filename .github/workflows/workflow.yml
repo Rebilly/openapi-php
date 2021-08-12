@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload coverage
         if: env.EXECUTE_COVERAGE == 'true'
-        run: composer upload-coverage -- --format=php-clover ${{ env.CLOVER_PATH }}
+        run: composer upload-coverage -- --format=php-clover ${{ env.CLOVER_PATH }} --repository=g/$GITHUB_REPOSITORY --parent=$GITHUB_BASE_REF
 
   lint:
     runs-on: ubuntu-latest
