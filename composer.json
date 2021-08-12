@@ -47,6 +47,7 @@
     "test-cs": "php-cs-fixer fix --verbose --dry-run --ansi",
     "fix-cs": "php-cs-fixer fix --verbose --ansi",
     "test-unit": "phpunit",
+    "upload-coverage": "ocular code-coverage:upload",
     "test": ["@test-unit", "@test-cs"]
   }
 }
