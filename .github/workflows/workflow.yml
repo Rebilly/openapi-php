@@ -7,10 +7,10 @@ jobs:
 
     strategy:
       matrix:
-        php-version: ['7.2', '7.3', '7.4', '8.0']
+        php-version: ['7.3', '7.4', '8.0']
 
     env:
-      EXECUTE_COVERAGE: ${{ matrix.php-version == '7.2' }}
+      EXECUTE_COVERAGE: ${{ matrix.php-version == '7.3' }}
       CLOVER_PATH: "clover.xml"
 
     steps:
@@ -62,7 +62,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        php-version: ['7.2']
+        php-version: ['7.3']
 
     steps:
       - uses: actions/checkout@v2
