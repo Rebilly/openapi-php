@@ -1,6 +1,4 @@
 <?php
-
-declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -10,6 +8,8 @@ declare(strict_types=1);
  *
  * @see https://www.rebilly.com
  */
+
+declare(strict_types=1);
 
 namespace Rebilly\OpenAPI;
 
