@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -12,6 +14,7 @@
 namespace Rebilly\OpenAPI;
 
 use InvalidArgumentException;
+use function count;
 
 final class SchemaTest extends TestCase
 {

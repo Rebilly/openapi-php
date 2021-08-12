@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -18,6 +20,10 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use Rebilly\OpenAPI\Schema;
 use stdClass;
+use function json_decode;
+use function mb_strpos;
+use function mb_strtolower;
+use function preg_split;
 
 /**
  * Asserts data against OpenAPI specification.

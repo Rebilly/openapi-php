@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -13,6 +15,7 @@ namespace Rebilly\OpenAPI\PhpUnit;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use Rebilly\OpenAPI\TestCase;
+use function date;
 
 final class JsonSchemaConstraintTest extends TestCase
 {

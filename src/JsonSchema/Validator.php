@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -16,6 +18,8 @@ use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\SchemaConstraint;
 use JsonSchema\Entity\JsonPointer;
 use stdClass;
+use function array_map;
+use function implode;
 
 /**
  * JSON Schema validator facade.

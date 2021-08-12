@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -14,6 +16,7 @@ namespace Rebilly\OpenAPI\PhpUnit;
 use Exception;
 use Rebilly\OpenAPI\TestCase;
 use Rebilly\OpenAPI\UnexpectedValueException;
+use function time;
 
 class HeadersConstraintTest extends TestCase
 {

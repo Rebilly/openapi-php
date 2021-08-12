@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -14,6 +16,9 @@ namespace Rebilly\OpenAPI;
 use PHPUnit\Framework;
 use stdClass;
 use UnexpectedValueException;
+use function json_decode;
+use function json_encode;
+use function preg_match;
 
 abstract class TestCase extends Framework\TestCase
 {

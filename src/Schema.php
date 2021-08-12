@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -17,6 +19,15 @@ use JsonSchema\SchemaStorage;
 use JsonSchema\Uri\UriResolver;
 use JsonSchema\Uri\UriRetriever;
 use stdClass;
+use function array_column;
+use function array_filter;
+use function array_keys;
+use function mb_strpos;
+use function mb_strtolower;
+use function preg_match;
+use function reset;
+use function sprintf;
+use function strtr;
 
 final class Schema
 {

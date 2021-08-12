@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -12,6 +14,12 @@
 namespace Rebilly\OpenAPI\PhpUnit;
 
 use PHPUnit\Framework\Constraint\Constraint;
+use function array_diff;
+use function array_map;
+use function implode;
+use function in_array;
+use function is_string;
+use function mb_strtoupper;
 
 /**
  * Constraint that asserts that the HTTP method matches the expected allowed methods.

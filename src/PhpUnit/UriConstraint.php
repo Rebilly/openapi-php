@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -17,6 +19,18 @@ use Psr\Http\Message\UriInterface;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 use Rebilly\OpenAPI\UnexpectedValueException;
 use stdClass;
+use function array_map;
+use function array_merge;
+use function count;
+use function implode;
+use function is_numeric;
+use function json_encode;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_substr;
+use function parse_str;
+use function preg_split;
+use function sprintf;
 
 /**
  * Constraint that asserts that the URI matches the expected

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -16,6 +18,13 @@ use PHPUnit\Framework\Constraint\Constraint;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 use Rebilly\OpenAPI\UnexpectedValueException;
 use stdClass;
+use function array_map;
+use function array_merge;
+use function is_array;
+use function is_numeric;
+use function json_decode;
+use function json_encode;
+use function reset;
 
 /**
  * Constraint that asserts that the headers list matches the expected defined schemas.

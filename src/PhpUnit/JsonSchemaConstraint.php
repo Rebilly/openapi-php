@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -14,6 +16,7 @@ namespace Rebilly\OpenAPI\PhpUnit;
 use PHPUnit\Framework\Constraint\Constraint;
 use Rebilly\OpenAPI\JsonSchema\Validator;
 use stdClass;
+use function json_encode;
 
 /**
  * Constraint that asserts that the object matches the expected JSON Schema.

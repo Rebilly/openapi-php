@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * This source file is proprietary and part of Rebilly.
  *
@@ -17,6 +19,7 @@ use GuzzleHttp\Psr7\Response;
 use Rebilly\OpenAPI\Schema;
 use Rebilly\OpenAPI\TestCase;
 use stdClass;
+use function json_encode;
 
 final class AssertsTest extends TestCase
 {
